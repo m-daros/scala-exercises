@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 
 class Folder ( override val parentPath: String, override val name: String, val children: List [ FileSystemEntity ] ) extends FileSystemEntity ( parentPath, name ) {
 
-  def replaceEntity (name: String, entity: Folder ): Folder = {
+  def replaceEntity ( name: String, entity: Folder ): Folder = {
 
     new Folder ( parentPath, name, children.filter ( e => ! e.name.equals ( name ) ) :+ entity )
   }
@@ -14,7 +14,7 @@ class Folder ( override val parentPath: String, override val name: String, val c
     new Folder ( parentPath, name, children.filter ( e => e.name.equals ( name ) ) )
   }
 
-  def addEntity (entity: FileSystemEntity ): Folder = {
+  def addEntity ( entity: FileSystemEntity ): Folder = {
 
     new Folder ( parentPath, name, children :+ entity )
   }
@@ -32,7 +32,7 @@ class Folder ( override val parentPath: String, override val name: String, val c
     }
   }
 
-  def hasEntry ( name: String ): Boolean = {
+  def hasEntity ( name: String ): Boolean = {
 
     children.map ( e => e.name ).contains ( name )
   }

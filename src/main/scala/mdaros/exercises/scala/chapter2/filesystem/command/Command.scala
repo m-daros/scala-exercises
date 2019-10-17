@@ -25,6 +25,10 @@ object Command {
 
       MkDirCommand.parse ( tokens )
     }
+    else if ( "touch".equals ( tokens ( 0 ).trim () ) ) {
+
+      TouchCommand.parse ( tokens )
+    }
     else if ( "ls".equals ( tokens ( 0 ).trim () ) ) {
 
       LsCommand.parse ( tokens )
