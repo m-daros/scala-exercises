@@ -12,7 +12,7 @@ class State ( val rootFolder: Folder, val workingFolder: Folder, val commandOutp
   def show (): Unit = {
 
     println ( commandOutput )
-    print ( State.COMMAND_PROPMPT )
+    print ( "[" + workingFolder.name + "]" + State.COMMAND_PROPMPT )
   }
 }
 

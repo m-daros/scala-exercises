@@ -18,7 +18,7 @@ class TouchCommand ( tokens: Array [String] ) extends CreateEntityCommand ( toke
 
 object TouchCommand {
 
-  // TODO Portare in una classe comune ?
+  // TODO Portare check in una classe comune ?
   def parse ( tokens: Array [String] ): Command = {
 
     if ( tokens.length < 2 ) {

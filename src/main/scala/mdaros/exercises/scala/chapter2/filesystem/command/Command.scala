@@ -37,6 +37,10 @@ object Command {
 
       PwdCommand.parse ( tokens )
     }
+    else if ( "cd".equals ( tokens ( 0 ).trim () ) ) {
+
+      CdCommand.parse ( tokens )
+    }
     else {
 
       UnknownCommand.parse ( tokens )

@@ -1,6 +1,6 @@
 package mdaros.exercises.scala.chapter2.filesystem.model
 
-class File ( override val parentPath: String, override val name: String, val contents: String ) extends FileSystemEntity ( parentPath, name ) {
+class File ( override val parentPath: String, override val name: String, val contents: String = "" ) extends FileSystemEntity ( parentPath, name ) {
 
   override def asFolder (): Folder = {
 

@@ -21,5 +21,8 @@ object Filesystem extends App {
     val commandLine = commandLineScanner.nextLine ()
     state = Command.from ( commandLine ).apply ( state )
     state.show ()
+
+    // TODO TMP
+    println ( "STATE workingFolder: " + state.workingFolder.path () )
   }
 }

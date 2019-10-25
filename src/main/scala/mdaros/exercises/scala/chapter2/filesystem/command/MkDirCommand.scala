@@ -19,7 +19,7 @@ case class MkDirCommand ( tokens: Array [String] ) extends CreateEntityCommand (
 
 object MkDirCommand {
 
-  // TODO Portare in una classe comune ?
+  // TODO Portare check in una classe comune ?
   def parse ( tokens: Array [String] ): Command = {
 
       if ( tokens.length < 2 ) {
