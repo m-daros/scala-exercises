@@ -6,18 +6,18 @@ class Folder ( override val parentPath: String, override val name: String, val c
 
   def isRoot (): Boolean = {
 
-    parentPath.equals ( Folder.ROOT.parentPath )
+    parentPath.equals ( Folder.ROOT_PARENT_PATH )
   }
 
-  def replaceEntity ( name: String, entity: Folder ): Folder = {
+  def replaceEntity ( folderName: String, entity: Folder ): Folder = {
 
-    new Folder ( parentPath, name, children.filter ( e => ! e.name.equals ( name ) ) :+ entity )
+    // TODO TMP
+    //println ( "replaceEntity ( folderName: " + folderName + ", entity: " + entity + " ). ACTUAL FOLDER name: " + name + ", path: " + path () );
+
+    new Folder ( parentPath, name, children.filter ( child => ! child.name.equals ( entity.name ) ) :+ entity )   // TODO ???????
   }
 
   def findEntity ( name: String ): FileSystemEntity  = {
-
-    // OLD
-//    new Folder ( parentPath, name, children.filter ( e => e.name.equals ( name ) ) )
 
     val filtered: List [FileSystemEntity] = children.filter ( e => e.name.equals ( name ) )
 
@@ -44,13 +44,16 @@ class Folder ( override val parentPath: String, override val name: String, val c
   @tailrec
   final def findDescendant ( folderNamesInPath: Array [String] ): Folder  = {
 
+    // TODO TMP
+    //println ( s"findDescendant ( folderNamesInPath.length: ${folderNamesInPath.length} )" )
+
     if ( folderNamesInPath.isEmpty ) {
 
       this
     }
     else {
 
-      findDescendant ( folderNamesInPath.tail )
+      findEntity ( folderNamesInPath.head ).asFolder ().findDescendant ( folderNamesInPath.tail )
     }
   }
 
@@ -73,11 +76,16 @@ class Folder ( override val parentPath: String, override val name: String, val c
 
     "Folder"
   }
+
+  //override def toString () = s"Folder ( parentPath: $parentPath, name: $name, isRoot: $isRoot, type: $getType )"
 }
 
 object Folder {
 
-  val ROOT: Folder = empty ( "", "" )
+//  val ROOT: Folder = empty ( "", "" )
+
+  val ROOT_PARENT_PATH = ""
+  val ROOT_NAME = ""
 
   def empty ( parentPath: String, name: String ): Folder = {
 

@@ -35,9 +35,9 @@ class CdCommand ( tokens: Array [String] ) extends Command {
   final def findFolder ( foldersNamesInPath: Array [String], currentFolder: Folder ): Folder = {
 
     // TMP
-    println ( "foldersNamesInPath length: " + foldersNamesInPath.length )
-    println ( "foldersNamesInPath: " + foldersNamesInPath.mkString ( ", " ) )
-    println ( "currentFolder.path: " + currentFolder.path () )
+//    println ( "foldersNamesInPath length: " + foldersNamesInPath.length )
+    //println ( "foldersNamesInPath: " + foldersNamesInPath.mkString ( ", " ) )
+    //println ( "currentFolder.path: " + currentFolder.path () )
 
     if ( foldersNamesInPath.isEmpty ) {
 
@@ -56,13 +56,13 @@ class CdCommand ( tokens: Array [String] ) extends Command {
   override def apply ( state: State ): State = {
 
     // TMP
-    println ( "WORKING FOLDER: " + state.workingFolder.path() )
+    //println ( "WORKING FOLDER: " + state.workingFolder.path() )
 
     // 1. Get the path of the destination folder
     val destinationFolderPath: String = getDestinationFolderPath ( tokens ( 1 ), state.workingFolder )
 
     // TMP
-    println ( "EVALUATED DESTINATION FOLDER: " + destinationFolderPath )
+    //println ( "EVALUATED DESTINATION FOLDER: " + destinationFolderPath )
 
     val foldersNamesInPath: Array [ String ] = destinationFolderPath.split ( FileSystemEntity.PATH_SEPARATOR ) // TODO *** Exclude the first empty string if exists
 
@@ -82,7 +82,7 @@ class CdCommand ( tokens: Array [String] ) extends Command {
     else {
 
       // TMP
-      println ( "destinationFolder: " + destinationFolder.path () )
+      //println ( "destinationFolder: " + destinationFolder.path () )
 
       // 3b. Change the state to change the working folder to be the destination folder
       new State ( state.rootFolder, destinationFolder, "" )

@@ -9,9 +9,9 @@ import mdaros.exercises.scala.chapter2.filesystem.state.State
 object Filesystem extends App {
 
   val commandLineScanner = new Scanner ( System.in )
-  val rootFolder = Folder.ROOT
+  val rootFolder = Folder.empty ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME )
 
-  var state = State ( Folder.ROOT, Folder.ROOT )
+  var state = State ( rootFolder, rootFolder )
   state.show ()
 
   while ( true ) {
@@ -23,6 +23,6 @@ object Filesystem extends App {
     state.show ()
 
     // TODO TMP
-    println ( "STATE workingFolder: " + state.workingFolder.path () )
+    println ( "STATE rootFolder: " + state.rootFolder.path () + ", workingFolder: " + state.workingFolder.path () )
   }
 }

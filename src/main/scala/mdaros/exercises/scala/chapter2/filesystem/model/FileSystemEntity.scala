@@ -12,7 +12,14 @@ abstract class FileSystemEntity ( val parentPath: String, val name: String ) {
 
   def path () = {
 
-    parentPath + FileSystemEntity.PATH_SEPARATOR + name
+    if ( parentPath.equals ( "/" ) ) {
+
+      FileSystemEntity.PATH_SEPARATOR + name
+    }
+    else {
+
+      parentPath + FileSystemEntity.PATH_SEPARATOR + name
+    }
   }
 
   override def toString: String = {
@@ -24,5 +31,6 @@ abstract class FileSystemEntity ( val parentPath: String, val name: String ) {
 object FileSystemEntity {
 
   val ROOT_FOLDER_PATH: String = "/"
+//  val ROOT_FOLDER_PATH: String = ""
   val PATH_SEPARATOR: String   = "/"
 }

@@ -50,6 +50,10 @@ abstract class CreateEntityCommand ( tokens: Array [String] ) extends Command {
     else {
 
       val oldFolder: Folder = currentFolder.findEntity ( folderNames.head ).asFolder ()
+
+      // TODO TMP
+      //println ( "updateTree (). currentFolder: " + currentFolder.path () + ", oldFolder: " + oldFolder.path () )
+
       currentFolder.replaceEntity ( oldFolder.name, updateTree ( oldFolder, folderNames.tail, newEntity ) )
     }
   }
@@ -60,13 +64,13 @@ abstract class CreateEntityCommand ( tokens: Array [String] ) extends Command {
     val folderPath: String = workingFolder.path ()
 
     // TMP
-    println ( "MKDIR doCreateEntity workingFolder.path (): " + workingFolder.path () )
+    //println ( "MKDIR doCreateEntity workingFolder.path (): " + workingFolder.path () )
 
     // 1. Get all the folders in fullPath
     val folderNamesInPath: Array [String] = getFolderNamesInPath ( folderPath )
 
     // TMP
-    println ( "MKDIR folderNamesInPath: " + folderNamesInPath.mkString ( ", " ) )
+    //println ( "MKDIR folderNamesInPath: " + folderNamesInPath.mkString ( ", " ) )
 
     // 2. Create new Folder into workingFolder
     val newFolder: FileSystemEntity = createEntity ( folderPath, folderName )
@@ -76,16 +80,16 @@ abstract class CreateEntityCommand ( tokens: Array [String] ) extends Command {
 
     // 4. Find new working folder INSTANCE given workingFolder full path in the NEW folder structure
     val newWorkingFolder: Folder = newRootFolder.findDescendant ( folderNamesInPath )
+//    val newWorkingFolder: Folder = newRootFolder.findEntity ( folderNamesInPath.head ).asFolder ()
 
     // TMP
-    println ( "MKDIR newWorkingFolder: " + newWorkingFolder.path () )
+    //println ( "MKDIR newRootFolder: " + newRootFolder.path () + ", newWorkingFolder: " + newWorkingFolder.path () )
 
     new State ( newRootFolder, newWorkingFolder, state.commandOutput )
   }
 
   protected def getFolderNamesInPath ( folderPath: String ) = {
 
-//    folderPath.split ( FileSystemEntity.PATH_SEPARATOR ).filter ( e => e.equals ( "" ) ) // TODO REMOCVE first if is an empty string
     folderPath.split ( FileSystemEntity.PATH_SEPARATOR ).filter ( e => ! e.equals ( "" ) ) // TODO REMOCVE first if is an empty string
   }
 
