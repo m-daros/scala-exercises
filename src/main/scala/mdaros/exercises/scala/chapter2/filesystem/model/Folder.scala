@@ -11,9 +11,6 @@ class Folder ( override val parentPath: String, override val name: String, val c
 
   def replaceEntity ( folderName: String, entity: Folder ): Folder = {
 
-    // TODO TMP
-    //println ( "replaceEntity ( folderName: " + folderName + ", entity: " + entity + " ). ACTUAL FOLDER name: " + name + ", path: " + path () );
-
     new Folder ( parentPath, name, children.filter ( child => ! child.name.equals ( entity.name ) ) :+ entity )   // TODO ???????
   }
 
@@ -44,9 +41,6 @@ class Folder ( override val parentPath: String, override val name: String, val c
   @tailrec
   final def findDescendant ( folderNamesInPath: Array [String] ): Folder  = {
 
-    // TODO TMP
-    //println ( s"findDescendant ( folderNamesInPath.length: ${folderNamesInPath.length} )" )
-
     if ( folderNamesInPath.isEmpty ) {
 
       this
@@ -76,13 +70,9 @@ class Folder ( override val parentPath: String, override val name: String, val c
 
     "Folder"
   }
-
-  //override def toString () = s"Folder ( parentPath: $parentPath, name: $name, isRoot: $isRoot, type: $getType )"
 }
 
 object Folder {
-
-//  val ROOT: Folder = empty ( "", "" )
 
   val ROOT_PARENT_PATH = ""
   val ROOT_NAME = ""

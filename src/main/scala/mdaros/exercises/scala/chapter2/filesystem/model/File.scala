@@ -16,8 +16,6 @@ class File ( override val parentPath: String, override val name: String, val con
 
     "File"
   }
-
-  //override def toString () = s"File ( parentPath: $parentPath, name: $name, type: $getType )"
 }
 
 object File {

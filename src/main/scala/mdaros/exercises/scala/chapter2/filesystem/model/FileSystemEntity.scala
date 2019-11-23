@@ -31,6 +31,5 @@ abstract class FileSystemEntity ( val parentPath: String, val name: String ) {
 object FileSystemEntity {
 
   val ROOT_FOLDER_PATH: String = "/"
-//  val ROOT_FOLDER_PATH: String = ""
   val PATH_SEPARATOR: String   = "/"
 }

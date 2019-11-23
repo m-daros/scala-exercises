@@ -41,8 +41,6 @@ abstract class CreateEntityCommand ( tokens: Array [String] ) extends Command {
 
   def updateTree ( currentFolder: Folder, folderNames: Array [String], newEntity: FileSystemEntity ): Folder = {
 
-    // TODO Le situazioni nelle quali folderNamesInPath =  , aName1, aName2 (con una prima string vuota fanno si che il workingFolder diventi ROOT)
-
     if ( folderNames.isEmpty ) {
 
       currentFolder.addEntity ( newEntity )
@@ -50,10 +48,6 @@ abstract class CreateEntityCommand ( tokens: Array [String] ) extends Command {
     else {
 
       val oldFolder: Folder = currentFolder.findEntity ( folderNames.head ).asFolder ()
-
-      // TODO TMP
-      //println ( "updateTree (). currentFolder: " + currentFolder.path () + ", oldFolder: " + oldFolder.path () )
-
       currentFolder.replaceEntity ( oldFolder.name, updateTree ( oldFolder, folderNames.tail, newEntity ) )
     }
   }
@@ -63,14 +57,8 @@ abstract class CreateEntityCommand ( tokens: Array [String] ) extends Command {
     val workingFolder: Folder = state.workingFolder
     val folderPath: String = workingFolder.path ()
 
-    // TMP
-    //println ( "MKDIR doCreateEntity workingFolder.path (): " + workingFolder.path () )
-
     // 1. Get all the folders in fullPath
     val folderNamesInPath: Array [String] = getFolderNamesInPath ( folderPath )
-
-    // TMP
-    //println ( "MKDIR folderNamesInPath: " + folderNamesInPath.mkString ( ", " ) )
 
     // 2. Create new Folder into workingFolder
     val newFolder: FileSystemEntity = createEntity ( folderPath, folderName )
@@ -80,10 +68,6 @@ abstract class CreateEntityCommand ( tokens: Array [String] ) extends Command {
 
     // 4. Find new working folder INSTANCE given workingFolder full path in the NEW folder structure
     val newWorkingFolder: Folder = newRootFolder.findDescendant ( folderNamesInPath )
-//    val newWorkingFolder: Folder = newRootFolder.findEntity ( folderNamesInPath.head ).asFolder ()
-
-    // TMP
-    //println ( "MKDIR newRootFolder: " + newRootFolder.path () + ", newWorkingFolder: " + newWorkingFolder.path () )
 
     new State ( newRootFolder, newWorkingFolder, state.commandOutput )
   }

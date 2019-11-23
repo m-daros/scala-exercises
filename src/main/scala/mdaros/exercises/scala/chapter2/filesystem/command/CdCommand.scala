@@ -59,8 +59,6 @@ class CdCommand ( tokens: Array [String] ) extends Command {
 
   def getDestinationFolderPath ( str: String, workingFolder: Folder ): String = {
 
-    println ( "getDestinationFolderPath (). str: [" + str + "]" )
-
     if ( str.equals ( FileSystemEntity.PATH_SEPARATOR ) ) {
 
       ""
@@ -71,21 +69,6 @@ class CdCommand ( tokens: Array [String] ) extends Command {
       val path: String = str.split ( FileSystemEntity.PATH_SEPARATOR )
         .filter ( token => ! token.equals ( "." ) )
         .mkString ( FileSystemEntity.PATH_SEPARATOR )
-
-      /*
-        cd /a/b/c/../../d   -> expected result /a/d
-        a, b, c, .., .., d
-
-        accum =             a, b, c, .., .., d
-        accum = a           b, c, .., .., d
-        accum = a, b        c, .., .., d
-        accum = a, b, c     .., .., d
-        accum = a, b        .., d
-        accum = a           d
-        RESULT = a/d --> OK
-       */
-
-      println ( "getDestinationFolderPath (). path: " + path )
 
       if ( path.startsWith ( FileSystemEntity.PATH_SEPARATOR ) ) {
 
@@ -107,8 +90,6 @@ class CdCommand ( tokens: Array [String] ) extends Command {
 
   @tailrec
   final def filterDotDot ( pathTokens: Array [String], accum: Array [String] ): Array [String] = {
-
-    println ( "pathTokens: [ " + pathTokens.mkString ( ", " ) + " ], accum: [ " + accum.mkString ( ", " ) + " ]" )
 
     if ( pathTokens.isEmpty ) {
 
@@ -133,11 +114,6 @@ class CdCommand ( tokens: Array [String] ) extends Command {
 
   @tailrec
   final def findFolder ( foldersNamesInPath: Array [String], currentFolder: Folder ): Folder = {
-
-    // TMP
-//    println ( "foldersNamesInPath length: " + foldersNamesInPath.length )
-    //println ( "foldersNamesInPath: " + foldersNamesInPath.mkString ( ", " ) )
-    //println ( "currentFolder.path: " + currentFolder.path () )
 
     if ( foldersNamesInPath.isEmpty ) {
 
