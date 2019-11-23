@@ -1,6 +1,6 @@
 package mdaros.exercises.scala.chapter2.filesystem.command
 
-import mdaros.exercises.scala.chapter2.filesystem.model.{FileSystemEntity, Folder}
+import mdaros.exercises.scala.chapter2.filesystem.model.{FileSystemEntity, Folder, MyFileSystemException}
 import mdaros.exercises.scala.chapter2.filesystem.state.State
 
 import scala.annotation.tailrec
@@ -12,22 +12,122 @@ class CdCommand ( tokens: Array [String] ) extends Command {
     CdCommand.parse ( tokens )
   }
 
-  def getDestinationFolderPath ( str: String, workingFolder: Folder ): String = {
+  override def apply ( state: State ): State = {
 
-    if ( str.startsWith ( FileSystemEntity.PATH_SEPARATOR ) ) {
+    try {
+      // TMP
+      //println ( "WORKING FOLDER: " + state.workingFolder.path() )
 
-      str
-    }
-    else {
+      // 1. Get the path of the destination folder
+      val destinationFolderPath: String = getDestinationFolderPath ( tokens ( 1 ), state.workingFolder )
 
-      if ( workingFolder.isRoot () ) {
+      // TMP
+      println ( "EVALUATED DESTINATION FOLDER: " + destinationFolderPath )
 
-        workingFolder.path ().substring ( 1 ) + FileSystemEntity.PATH_SEPARATOR + str
+      val foldersNamesInPath: Array [String] = destinationFolderPath.split ( FileSystemEntity.PATH_SEPARATOR ) // TODO *** Exclude the first empty string if exists
+
+      // 2. Find the destination folder, if exists
+      var destinationFolder: Folder = state.workingFolder
+
+      if ( ! foldersNamesInPath.isEmpty ) {
+
+        destinationFolder = findFolder ( foldersNamesInPath.tail, state.rootFolder ) // Se lo tolgo prima, evitare qui di fare il tail
+      }
+
+      if ( destinationFolder == null ) {
+
+        // 3a. Notify the user if the specified folder doesn't exist
+        state.setMessage ( "Unable to find folder at the given path " + tokens (1  ) )
       }
       else {
 
-        workingFolder.path () + FileSystemEntity.PATH_SEPARATOR + str
+        // TMP
+        //println ( "destinationFolder: " + destinationFolder.path () )
+
+        // 3b. Change the state to change the working folder to be the destination folder
+        new State ( state.rootFolder, destinationFolder, "" )
       }
+    }
+    catch  {
+
+      case e: Exception => {
+
+        new State ( state.rootFolder, state.workingFolder, s"Unable to cd to the required Folder ${tokens.last}" )
+      }
+    }
+  }
+
+  def getDestinationFolderPath ( str: String, workingFolder: Folder ): String = {
+
+    println ( "getDestinationFolderPath (). str: [" + str + "]" )
+
+    if ( str.equals ( FileSystemEntity.PATH_SEPARATOR ) ) {
+
+      ""
+    }
+    else {
+
+      // Remove dots in the given str
+      val path: String = str.split ( FileSystemEntity.PATH_SEPARATOR )
+        .filter ( token => ! token.equals ( "." ) )
+        .mkString ( FileSystemEntity.PATH_SEPARATOR )
+
+      /*
+        cd /a/b/c/../../d   -> expected result /a/d
+        a, b, c, .., .., d
+
+        accum =             a, b, c, .., .., d
+        accum = a           b, c, .., .., d
+        accum = a, b        c, .., .., d
+        accum = a, b, c     .., .., d
+        accum = a, b        .., d
+        accum = a           d
+        RESULT = a/d --> OK
+       */
+
+      println ( "getDestinationFolderPath (). path: " + path )
+
+      if ( path.startsWith ( FileSystemEntity.PATH_SEPARATOR ) ) {
+
+        filterDotDot ( path.split ( FileSystemEntity.PATH_SEPARATOR ), new Array [String] ( 0 ) ).mkString ( FileSystemEntity.PATH_SEPARATOR )
+      }
+      else {
+
+        if ( workingFolder.isRoot () ) {
+
+          filterDotDot ( ( workingFolder.path ().substring ( 1 ) + FileSystemEntity.PATH_SEPARATOR + path ).split ( FileSystemEntity.PATH_SEPARATOR ), new Array [String] ( 0 ) ).mkString ( FileSystemEntity.PATH_SEPARATOR )
+        }
+        else {
+
+          filterDotDot ( ( workingFolder.path () + FileSystemEntity.PATH_SEPARATOR + path ).split ( FileSystemEntity.PATH_SEPARATOR ), new Array [String] ( 0 ) ).mkString ( FileSystemEntity.PATH_SEPARATOR )
+        }
+      }
+    }
+  }
+
+  @tailrec
+  final def filterDotDot ( pathTokens: Array [String], accum: Array [String] ): Array [String] = {
+
+    println ( "pathTokens: [ " + pathTokens.mkString ( ", " ) + " ], accum: [ " + accum.mkString ( ", " ) + " ]" )
+
+    if ( pathTokens.isEmpty ) {
+
+      accum
+    }
+    else if ( pathTokens.head.equals ( ".." ) ) {
+
+      if ( accum.isEmpty || accum.tail.isEmpty ) {
+
+        throw new MyFileSystemException ( "Unable to change dir to the given path" )
+      }
+      else {
+
+        filterDotDot ( pathTokens.tail, accum.slice ( 0, accum.length - 1 ) )
+      }
+    }
+    else {
+
+      filterDotDot ( pathTokens.tail, accum :+ pathTokens.head )
     }
   }
 
@@ -50,42 +150,6 @@ class CdCommand ( tokens: Array [String] ) extends Command {
     else {
 
         findFolder ( foldersNamesInPath.tail, currentFolder.findEntity ( foldersNamesInPath.head ).asFolder () )
-    }
-  }
-
-  override def apply ( state: State ): State = {
-
-    // TMP
-    //println ( "WORKING FOLDER: " + state.workingFolder.path() )
-
-    // 1. Get the path of the destination folder
-    val destinationFolderPath: String = getDestinationFolderPath ( tokens ( 1 ), state.workingFolder )
-
-    // TMP
-    //println ( "EVALUATED DESTINATION FOLDER: " + destinationFolderPath )
-
-    val foldersNamesInPath: Array [ String ] = destinationFolderPath.split ( FileSystemEntity.PATH_SEPARATOR ) // TODO *** Exclude the first empty string if exists
-
-    // 2. Find the destination folder, if exists
-    var destinationFolder: Folder = state.workingFolder
-
-    if ( ! foldersNamesInPath.isEmpty ) {
-
-      destinationFolder = findFolder ( foldersNamesInPath.tail, state.rootFolder ) // Se lo tolgo prima, evitare qui di fare il tail
-    }
-
-    if ( destinationFolder == null ) {
-
-      // 3a. Notify the user if the specified folder doesn't exist
-      state.setMessage ( "Unable to find folder at the given path " + tokens ( 1 ) )
-    }
-    else {
-
-      // TMP
-      //println ( "destinationFolder: " + destinationFolder.path () )
-
-      // 3b. Change the state to change the working folder to be the destination folder
-      new State ( state.rootFolder, destinationFolder, "" )
     }
   }
 }

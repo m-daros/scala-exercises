@@ -23,6 +23,6 @@ object Filesystem extends App {
     state.show ()
 
     // TODO TMP
-    println ( "STATE rootFolder: " + state.rootFolder.path () + ", workingFolder: " + state.workingFolder.path () )
+//    println ( "STATE rootFolder: " + state.rootFolder.path () + ", workingFolder: " + state.workingFolder.path () )
   }
 }

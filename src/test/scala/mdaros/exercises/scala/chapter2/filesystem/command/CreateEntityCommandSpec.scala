@@ -21,11 +21,11 @@ class CreateEntityCommandSpec extends FlatSpec with Matchers {
     // Assertions
     newState.workingFolder.parentPath should be ( "" )
     newState.workingFolder.children.size should be ( 1 )
-    newState.workingFolder.name should be ( "" )
+    newState.workingFolder.name should be ( Folder.ROOT_NAME )
 
     newState.rootFolder.parentPath should be ( "" )
     newState.rootFolder.children.size should be ( 1 )
-    newState.rootFolder.name should be ( "" )
+    newState.rootFolder.name should be ( Folder.ROOT_NAME )
 
     val createdEntity = newState.workingFolder.children ( 0 )
 
@@ -52,11 +52,11 @@ class CreateEntityCommandSpec extends FlatSpec with Matchers {
     // Assertions
     newState.workingFolder.parentPath should be ( "" )
     newState.workingFolder.children.size should be ( 1 )
-    newState.workingFolder.name should be ( "" )
+    newState.workingFolder.name should be ( Folder.ROOT_NAME )
 
     newState.rootFolder.parentPath should be ( "" )
     newState.rootFolder.children.size should be ( 1 )
-    newState.rootFolder.name should be ( "" )
+    newState.rootFolder.name should be ( Folder.ROOT_NAME )
 
     val createdEntity = newState.workingFolder.children ( 0 )
 
