@@ -22,7 +22,7 @@ class CdCommand ( tokens: Array [String] ) extends Command {
       val destinationFolderPath: String = getDestinationFolderPath ( tokens ( 1 ), state.workingFolder )
 
       // TMP
-      println ( "EVALUATED DESTINATION FOLDER: " + destinationFolderPath )
+      //println ( "EVALUATED DESTINATION FOLDER: " + destinationFolderPath )
 
       val foldersNamesInPath: Array [String] = destinationFolderPath.split ( FileSystemEntity.PATH_SEPARATOR ) // TODO *** Exclude the first empty string if exists
 
