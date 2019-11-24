@@ -4,6 +4,8 @@ import mdaros.exercises.scala.chapter2.filesystem.state.State
 
 import scala.annotation.tailrec
 
+// TODO Gestire casi del tipo mkdir /folder1/folder2 (o impedire trattandolo come caso non gestito)
+
 case class MkDirCommand ( tokens: Array [String] ) extends CreateEntityCommand ( tokens ) {
 
   override def parse ( tokens: Array [String] ): Command = {

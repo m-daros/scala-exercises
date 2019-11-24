@@ -41,6 +41,10 @@ object Command {
 
       CdCommand.parse ( tokens )
     }
+    else if ( "rm".equals ( tokens ( 0 ).trim () ) ) {
+
+      RmCommand.parse ( tokens )
+    }
     else {
 
       UnknownCommand.parse ( tokens )

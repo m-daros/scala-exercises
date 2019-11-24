@@ -32,10 +32,20 @@ class Folder ( override val parentPath: String, override val name: String, val c
 
     if ( hasEntity ( entity.name ) ) {
 
-      throw new MyFileSystemException ( "Folder " + parentPath + " already contains an entity with name" + entity.name )
+      throw new MyFileSystemException ( "Folder " + path () + " already contains an entity with name" + entity.name )
     }
 
     new Folder ( parentPath, name, children :+ entity )
+  }
+
+  def removeEntity ( entityName: String ): Folder = {
+
+    if ( ! hasEntity ( entityName ) ) {
+
+      throw new MyFileSystemException ( "Folder " + path () + " does not contain an entity with name " + entityName + " unable to remove the entity" )
+    }
+
+    new Folder ( parentPath, name, children.filter ( child => ! child.name.equals ( entityName ) ) )
   }
 
   @tailrec

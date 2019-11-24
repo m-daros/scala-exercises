@@ -148,4 +148,53 @@ class FolderSpec extends FlatSpec with Matchers {
     foundChild2 should be ( null )
     foundChild3 should be ( null )
   }
+
+  "removeEntity ( name )" should "throw an exception if the working folder doe not contains the folder we want to remove" in {
+
+    val child1: Folder = new Folder ( "/folder1/folder2/myFolder", "child1" )
+    val child2: Folder = new Folder ( "/folder1/folder2/myFolder", "child2" )
+
+    val folder: Folder = new Folder ( "/folder1/folder2", "myFolder", List ( child1, child2 ) )
+
+    val exception = intercept [ Exception ] {
+
+      // Invoke the method expecting an exception
+      folder.removeEntity ( "child3" )
+    }
+
+    // Assertions
+    exception.isInstanceOf [ MyFileSystemException ] should be ( true )
+
+    val myFileSystemException = exception.asInstanceOf [ MyFileSystemException ]
+
+    myFileSystemException.message.contains ( "/folder1/folder2/myFolder" )   should be ( true )
+    myFileSystemException.message.contains ( "child3" )                      should be ( true )
+  }
+
+  "removeEntity ( name )" should "not have the removed child" in {
+
+    val childFolder1: Folder = new Folder ( "/folder1/folder2/myFolder", "childFolder1" )
+    val childFolder2: Folder = new Folder ( "/folder1/folder2/myFolder", "childFolder2" )
+    val childFile3: File     = new File ( "/folder1/folder2/myFolder", "childFile3" )
+
+    val folder: Folder = new Folder ( "/folder1/folder2", "myFolder", List ( childFolder1, childFolder2, childFile3 ) )
+
+    // Invoke method under test
+    val updatedFolder1: Folder = folder.removeEntity ( "childFolder1" )
+
+    updatedFolder1.children.size should be ( 2 )
+    updatedFolder1.children ( 0 ) should be ( childFolder2 )
+    updatedFolder1.children ( 1 ) should be ( childFile3 )
+
+    // Invoke method under test
+    val updatedFolder2: Folder = updatedFolder1.removeEntity ( "childFolder2" )
+
+    updatedFolder2.children.size should be ( 1 )
+    updatedFolder2.children ( 0 ) should be ( childFile3 )
+
+    // Invoke method under test
+    val updatedFolder3: Folder = updatedFolder2.removeEntity ( "childFile3" )
+
+    updatedFolder3.children.size should be ( 0 )
+  }
 }
