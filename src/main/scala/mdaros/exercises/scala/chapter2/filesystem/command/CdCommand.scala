@@ -5,7 +5,7 @@ import mdaros.exercises.scala.chapter2.filesystem.state.State
 
 import scala.annotation.tailrec
 
-class CdCommand ( tokens: Array [String] ) extends Command {
+class CdCommand ( val arguments: Array [String] ) extends Command {
 
   override def parse ( tokens: Array [String] ): Command = {
 
@@ -19,7 +19,7 @@ class CdCommand ( tokens: Array [String] ) extends Command {
       //println ( "WORKING FOLDER: " + state.workingFolder.path() )
 
       // 1. Get the path of the destination folder
-      val destinationFolderPath: String = getDestinationFolderPath ( tokens ( 1 ), state.workingFolder )
+      val destinationFolderPath: String = getDestinationFolderPath ( arguments ( 1 ), state.workingFolder )
 
       // TMP
       //println ( "EVALUATED DESTINATION FOLDER: " + destinationFolderPath )
@@ -37,7 +37,7 @@ class CdCommand ( tokens: Array [String] ) extends Command {
       if ( destinationFolder == null ) {
 
         // 3a. Notify the user if the specified folder doesn't exist
-        state.setMessage ( "Unable to find folder at the given path " + tokens (1  ) )
+        state.setMessage ( "Unable to find folder at the given path " + arguments (1  ) )
       }
       else {
 
@@ -52,7 +52,7 @@ class CdCommand ( tokens: Array [String] ) extends Command {
 
       case e: Exception => {
 
-        new State ( state.rootFolder, state.workingFolder, s"Unable to cd to the required Folder ${tokens.last}" )
+        new State ( state.rootFolder, state.workingFolder, s"Unable to cd to the required Folder ${arguments.last}" )
       }
     }
   }
