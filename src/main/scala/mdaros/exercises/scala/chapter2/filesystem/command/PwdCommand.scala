@@ -3,7 +3,7 @@ package mdaros.exercises.scala.chapter2.filesystem.command
 import mdaros.exercises.scala.chapter2.filesystem.model.Folder
 import mdaros.exercises.scala.chapter2.filesystem.state.State
 
-class PwdCommand extends Command {
+class PwdCommand ( val arguments: Array [String] ) extends Command {
 
   override def parse ( tokens: Array [String] ): Command = {
 
@@ -21,6 +21,6 @@ object PwdCommand {
 
   def parse ( tokens: Array [String] ): PwdCommand = {
 
-    new PwdCommand ()
+    new PwdCommand ( tokens )
   }
 }

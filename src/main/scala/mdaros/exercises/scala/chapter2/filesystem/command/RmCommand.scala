@@ -5,7 +5,7 @@ import mdaros.exercises.scala.chapter2.filesystem.state.State
 
 import scala.annotation.tailrec
 
-case class RmCommand ( tokens: Array [String] ) extends Command {
+case class RmCommand ( val arguments: Array [String] ) extends Command {
 
   override def parse ( tokens: Array [String] ): Command = {
 
@@ -41,7 +41,7 @@ case class RmCommand ( tokens: Array [String] ) extends Command {
       }
     }
 
-    applyHelper ( state, tokens.tail ) // Discard first token since it's the command name
+    applyHelper ( state, arguments.tail ) // Discard first token since it's the command name
   }
 
   def doRemoveEntity ( state: State, entityName: String ): State = {

@@ -1,9 +1,9 @@
 package mdaros.exercises.scala.chapter2.filesystem.command
 import mdaros.exercises.scala.chapter2.filesystem.state.State
 
-class LsCommand extends Command {
+class LsCommand ( val arguments: Array [String] ) extends Command {
 
-  override def parse ( tokens: Array [String] ): Command = {
+  override def parse (tokens: Array [String] ): Command = {
 
     LsCommand.parse ( tokens )
   }
@@ -18,6 +18,6 @@ object LsCommand {
 
   def parse ( tokens: Array [String] ): LsCommand = {
 
-    new LsCommand ()
+    new LsCommand ( tokens )
   }
 }

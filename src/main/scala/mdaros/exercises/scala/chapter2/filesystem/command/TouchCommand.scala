@@ -3,7 +3,7 @@ package mdaros.exercises.scala.chapter2.filesystem.command
 import mdaros.exercises.scala.chapter2.filesystem.model.{File, FileSystemEntity}
 import mdaros.exercises.scala.chapter2.filesystem.state.State
 
-class TouchCommand ( tokens: Array [String] ) extends CreateEntityCommand ( tokens ) {
+class TouchCommand ( val arguments: Array [String] ) extends CreateEntityCommand ( arguments ) {
 
   override def parse ( tokens: Array [String] ): Command = {
 

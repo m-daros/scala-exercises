@@ -1,7 +1,7 @@
 package mdaros.exercises.scala.chapter2.filesystem.command
 import mdaros.exercises.scala.chapter2.filesystem.state.State
 
-case class MalformedCommand ( tokens: Array [String] ) extends Command {
+case class MalformedCommand (arguments: Array [String] ) extends Command {
 
   override def parse ( tokens: Array [String] ): Command = {
 
@@ -10,7 +10,7 @@ case class MalformedCommand ( tokens: Array [String] ) extends Command {
 
   override def apply ( state: State ): State = {
 
-    state.setMessage (  tokens.mkString ( " " ) + " Malformed command" )
+    state.setMessage (  arguments.mkString ( " " ) + " Malformed command" )
   }
 }
 

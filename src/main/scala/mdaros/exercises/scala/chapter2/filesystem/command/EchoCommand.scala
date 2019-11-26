@@ -2,7 +2,7 @@ package mdaros.exercises.scala.chapter2.filesystem.command
 
 import mdaros.exercises.scala.chapter2.filesystem.state.State
 
-class EchoCommand ( arguments: Array [String] ) extends Command {
+class EchoCommand ( val arguments: Array [String] ) extends Command {
 
   override def parse ( tokens: Array [String] ): Command = {
 

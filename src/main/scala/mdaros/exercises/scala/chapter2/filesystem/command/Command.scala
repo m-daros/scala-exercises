@@ -45,6 +45,10 @@ object Command {
 
       RmCommand.parse ( tokens )
     }
+    else if ( "echo".equals ( tokens ( 0 ).trim () ) ) {
+
+      EchoCommand.parse ( tokens )
+    }
     else {
 
       UnknownCommand.parse ( tokens )
