@@ -1,5 +1,6 @@
 package mdaros.exercises.scala.chapter2.filesystem.command
 
+import mdaros.exercises.scala.chapter2.filesystem.model.{File, FileSystemEntity, Folder, MyFileSystemException}
 import mdaros.exercises.scala.chapter2.filesystem.state.State
 
 class EchoCommand ( val arguments: Array [String] ) extends Command {
@@ -13,23 +14,93 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
 
     if ( arguments.length == 2 ) {
 
-      new State ( state.rootFolder, state.workingFolder, arguments ( 1 ) )
+      echoToStdout ( state, arguments.tail )
+    }
+    else if ( arguments ( arguments.length - 2 ).equals ( ">" ) ) {
+
+      echoToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = true )
+    }
+    else if ( arguments ( arguments.length - 2 ).equals ( ">>" ) ) {
+
+      echoToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = false )
     }
     else {
 
-      ??? // TODO ...
+      echoToStdout ( state, arguments.tail )
     }
-    /*
-  - arguments > 2
-    - arguments ( length - 2 ) = ">"
-      -> echo to the file arguments ( length - 1 ) overwriting file
+  }
 
-    - arguments ( length - 2 ) = ">>"
-      -> echo to the file arguments ( length - 1 ) appending to file
+  def echoToStdout ( state: State, words: Array [ String ] ) : State = {
 
-    - arguments ( length - 2 ) != = ">" && != ">>"
-      -> echo all arguments
- */
+    new State ( state.rootFolder, state.workingFolder, words.mkString ( " " ) )
+  }
+
+  def echoToFile ( state: State, fileName: String, words: Array [ String ], overwrite: Boolean ): State = {
+
+    val entity: FileSystemEntity = state.workingFolder.findEntity ( fileName )
+
+    val folderNamesInPath = state.workingFolder.path ().split ( FileSystemEntity.PATH_SEPARATOR ).tail;
+
+    if ( entity == null ) {
+
+      def adder ( folder: Folder, entity: FileSystemEntity ): Folder = {
+
+        folder.addEntity ( entity )
+      }
+
+      val targetFile: File = new File ( state.workingFolder.path (), fileName, words.mkString ( " " ) )
+      val newRoot = updateTree ( state.rootFolder, folderNames = folderNamesInPath, targetFile, adder )
+      val newWorkingFolder: Folder = newRoot.findDescendant ( folderNamesInPath )
+
+      new State ( newRoot, newWorkingFolder, "" )
+    }
+    else if ( entity.getType ().equals ( "Folder" ) ) { // TODO Use constant for Type Directory 7 Type File or implements methods isFIle (), isFOlder ()
+
+      throw new MyFileSystemException ( "Unable to echo contents to the item " + entity.path () + " because it's a Folder" )
+    }
+    else {
+
+      def replacer ( folder: Folder, entity: FileSystemEntity ): Folder = {
+
+        folder.replaceEntity ( entity )
+      }
+
+      // Get the old file, create new file
+      val oldFile: File = entity.asFile ()
+      val newFile: File = new File ( state.workingFolder.path (), fileName, buildNewContent ( oldFile.contents, words, overwrite ) )
+      val newRoot = updateTree ( state.rootFolder, folderNames = folderNamesInPath, newFile, replacer )
+      val newWorkingFolder: Folder = newRoot.findDescendant ( folderNamesInPath )
+
+      new State ( newRoot, newWorkingFolder, "" )
+    }
+  }
+
+
+
+  // TODO Copiato da CreateEntityCommand --> Portare in una classe comune
+  def updateTree ( currentFolder: Folder, folderNames: Array [String], newEntity: FileSystemEntity, updater: ( Folder, FileSystemEntity ) => Folder ): Folder = {
+
+    if ( folderNames.isEmpty ) {
+
+      updater.apply ( currentFolder, newEntity );
+    }
+    else {
+
+      val oldFolder: Folder = currentFolder.findEntity ( folderNames.head ).asFolder ()
+      currentFolder.replaceEntity ( updateTree ( oldFolder, folderNames.tail, newEntity, updater ) )
+    }
+  }
+
+  private def buildNewContent ( oldContent: String, newContents: Array [String], overwrite: Boolean ) = {
+
+    if ( overwrite ) {
+
+      newContents.mkString ( " " )
+    }
+    else {
+
+      oldContent + "\n" + newContents.mkString ( " " )
+    }
   }
 }
 
