@@ -48,7 +48,7 @@ abstract class CreateEntityCommand ( tokens: Array [String] ) extends Command {
     else {
 
       val oldFolder: Folder = currentFolder.findEntity ( folderNames.head ).asFolder ()
-      currentFolder.replaceEntity ( oldFolder.name, updateTree ( oldFolder, folderNames.tail, newEntity ) )
+      currentFolder.replaceEntity ( updateTree ( oldFolder, folderNames.tail, newEntity ) )
     }
   }
 
@@ -60,13 +60,13 @@ abstract class CreateEntityCommand ( tokens: Array [String] ) extends Command {
     // 1. Get all the folders in fullPath
     val folderNamesInPath: Array [String] = getFolderNamesInPath ( folderPath )
 
-    // 2. Create new Folder into workingFolder
-    val newFolder: FileSystemEntity = createEntity ( folderPath, folderName )
+    // 2. Create new entity into workingFolder
+    val newEntity: FileSystemEntity = createEntity ( folderPath, folderName )
 
     // 3. Update the whole folder structure starting from ROOT to fullPath
-    val newRootFolder: Folder = updateTree ( state.rootFolder, folderNamesInPath, newFolder )
+    val newRootFolder: Folder = updateTree ( state.rootFolder, folderNamesInPath, newEntity )
 
-    // 4. Find new working folder INSTANCE given workingFolder full path in the NEW folder structure
+    // 4. Find new working folder instance given workingFolder full path in the NEW folder structure
     val newWorkingFolder: Folder = newRootFolder.findDescendant ( folderNamesInPath )
 
     new State ( newRootFolder, newWorkingFolder, state.commandOutput )

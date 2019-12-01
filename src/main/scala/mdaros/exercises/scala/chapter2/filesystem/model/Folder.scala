@@ -9,9 +9,9 @@ class Folder ( override val parentPath: String, override val name: String, val c
     parentPath.equals ( Folder.ROOT_PARENT_PATH )
   }
 
-  def replaceEntity ( folderName: String, entity: Folder ): Folder = {
+  def replaceEntity ( entity: FileSystemEntity ): Folder = {
 
-    new Folder ( parentPath, name, children.filter ( child => ! child.name.equals ( entity.name ) ) :+ entity )   // TODO ???????
+    new Folder ( parentPath, name, children.filter ( child => ! child.name.equals ( entity.name ) ) :+ entity )
   }
 
   def findEntity ( name: String ): FileSystemEntity  = {
