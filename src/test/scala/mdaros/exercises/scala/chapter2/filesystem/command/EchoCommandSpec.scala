@@ -91,7 +91,6 @@ class EchoCommandSpec extends FlatSpec with Matchers {
     file.contents  should be ( "something somethingelse" )
   }
 
-  // TODO do the same test having a file that already exists in order to see the append mode
   "EchoCommand.apply ()" should "echo to the file having name equals the last argument when invoked with more than 2 arguments having '>>' before the last argument" in {
 
     val tokens: Array [String] = Array ( "echo", "something", "somethingelse", ">>", "someFile" )
@@ -174,5 +173,33 @@ class EchoCommandSpec extends FlatSpec with Matchers {
     val myFileSystemException = exception.asInstanceOf [ MyFileSystemException ]
 
     myFileSystemException.message.contains ( "/folder1/folder2" )   should be ( true )
+  }
+
+  "EchoCommand.apply ()" should "on ROOT folder as working folder, echo to the file having name equals the last argument when invoked with more than 2 arguments having '>>' before the last argument" in {
+
+    val tokens: Array [String] = Array ( "echo", "something", "somethingelse", ">", "someFile" )
+
+    // Invoke the method under test
+    val command: Command = EchoCommand.parse ( tokens )
+
+    val rootFolder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME )
+
+    val state: State = command.apply ( new State ( rootFolder, rootFolder, "" ) )
+
+    // Assertions
+    state.commandOutput           should be ( "" )
+    state.rootFolder.name         should be ( Folder.ROOT_NAME )
+    state.rootFolder.parentPath   should be ( Folder.ROOT_PARENT_PATH )
+
+    val children: List [ FileSystemEntity ] = state.workingFolder.children
+
+    // Assertions on children
+    children.length should be ( 1 )
+
+    children ( 0 ).isInstanceOf [ File ] should be ( true )
+
+    val file: File = children ( 0 ).asInstanceOf [ File ]
+
+    file.contents  should be ( "something somethingelse" )
   }
 }

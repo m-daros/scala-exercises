@@ -39,7 +39,7 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
 
     val entity: FileSystemEntity = state.workingFolder.findEntity ( fileName )
 
-    val folderNamesInPath = state.workingFolder.path ().split ( FileSystemEntity.PATH_SEPARATOR ).tail;
+    val folderNamesInPath: Array [String] = getFolderNamesInPath ( state.workingFolder.path () );
 
     if ( entity == null ) {
 
@@ -75,7 +75,20 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
     }
   }
 
+  // TODO Testare
+  protected def getFolderNamesInPath ( path: String )  = {
 
+    val splits: Array [ String ] = path.split ( FileSystemEntity.PATH_SEPARATOR )
+
+    if ( splits.isEmpty ) {
+
+      Array [ String ] ()
+    }
+    else {
+
+      splits.tail
+    }
+  }
 
   // TODO Copiato da CreateEntityCommand --> Portare in una classe comune
   def updateTree ( currentFolder: Folder, folderNames: Array [String], newEntity: FileSystemEntity, updater: ( Folder, FileSystemEntity ) => Folder ): Folder = {
