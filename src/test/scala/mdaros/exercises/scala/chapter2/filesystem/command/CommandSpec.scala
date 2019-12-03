@@ -160,4 +160,19 @@ class CommandSpec extends FlatSpec with Matchers {
     // Assertions on command arguments
     pwdCommand.arguments.length  should be ( 1 )
   }
+
+  "Command" should "parse the string 'cat' to a CatCommand" in {
+
+    // Invoke the method under test
+    val command: Command = Command.from ( "cat someFile" )
+
+    // Assertions
+    command.isInstanceOf [ CatCommand ] should be ( true )
+
+    val catCommand: CatCommand = command.asInstanceOf [ CatCommand ]
+
+    // Assertions on command arguments
+    catCommand.arguments.length  should be ( 2 )
+    catCommand.arguments ( 1 )   should be ( "someFile" )
+  }
 }

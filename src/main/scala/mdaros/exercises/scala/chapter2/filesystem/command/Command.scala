@@ -49,6 +49,10 @@ object Command {
 
       EchoCommand.parse ( tokens )
     }
+    else if ( "cat".equals ( tokens ( 0 ).trim () ) ) {
+
+      CatCommand.parse ( tokens )
+    }
     else {
 
       UnknownCommand.parse ( tokens )

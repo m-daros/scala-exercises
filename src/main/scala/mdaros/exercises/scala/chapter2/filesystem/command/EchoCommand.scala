@@ -10,6 +10,7 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
     EchoCommand.parse ( tokens )
   }
 
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
   override def apply ( state: State ): State = {
 
     if ( arguments.length == 2 ) {
@@ -30,11 +31,13 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
     }
   }
 
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
   def echoToStdout ( state: State, words: Array [ String ] ) : State = {
 
     new State ( state.rootFolder, state.workingFolder, words.mkString ( " " ) )
   }
 
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
   def echoToFile ( state: State, fileName: String, words: Array [ String ], overwrite: Boolean ): State = {
 
     val entity: FileSystemEntity = state.workingFolder.findEntity ( fileName )
@@ -75,6 +78,7 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
     }
   }
 
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
   // TODO Testare
   protected def getFolderNamesInPath ( path: String )  = {
 
@@ -90,6 +94,7 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
     }
   }
 
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
   // TODO Copiato da CreateEntityCommand --> Portare in una classe comune
   def updateTree ( currentFolder: Folder, folderNames: Array [String], newEntity: FileSystemEntity, updater: ( Folder, FileSystemEntity ) => Folder ): Folder = {
 
@@ -104,6 +109,7 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
     }
   }
 
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
   private def buildNewContent ( oldContent: String, newContents: Array [String], overwrite: Boolean ) = {
 
     if ( overwrite ) {
