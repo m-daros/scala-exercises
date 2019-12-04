@@ -15,30 +15,30 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
 
     if ( arguments.length == 2 ) {
 
-      echoToStdout ( state, arguments.tail )
+      writeToStdout ( state, arguments.tail )
     }
     else if ( arguments ( arguments.length - 2 ).equals ( ">" ) ) {
 
-      echoToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = true )
+      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = true )
     }
     else if ( arguments ( arguments.length - 2 ).equals ( ">>" ) ) {
 
-      echoToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = false )
+      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = false )
     }
     else {
 
-      echoToStdout ( state, arguments.tail )
+      writeToStdout ( state, arguments.tail )
     }
   }
 
   // TODO Può essere estratta logica condivisa con il comando CatCommand
-  def echoToStdout ( state: State, words: Array [ String ] ) : State = {
+  def writeToStdout ( state: State, words: Array [ String ] ) : State = {
 
     new State ( state.rootFolder, state.workingFolder, words.mkString ( " " ) )
   }
 
   // TODO Può essere estratta logica condivisa con il comando CatCommand
-  def echoToFile ( state: State, fileName: String, words: Array [ String ], overwrite: Boolean ): State = {
+  def writeToFile ( state: State, fileName: String, words: Array [ String ], overwrite: Boolean ): State = {
 
     val entity: FileSystemEntity = state.workingFolder.findEntity ( fileName )
 
@@ -46,13 +46,8 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
 
     if ( entity == null ) {
 
-      def adder ( folder: Folder, entity: FileSystemEntity ): Folder = {
-
-        folder.addEntity ( entity )
-      }
-
       val targetFile: File = new File ( state.workingFolder.path (), fileName, words.mkString ( " " ) )
-      val newRoot = updateTree ( state.rootFolder, folderNames = folderNamesInPath, targetFile, adder )
+      val newRoot = updateTree ( state.rootFolder, folderNames = folderNamesInPath, targetFile, ( folder: Folder, entity: FileSystemEntity ) => folder.addEntity ( entity ) )
       val newWorkingFolder: Folder = newRoot.findDescendant ( folderNamesInPath )
 
       new State ( newRoot, newWorkingFolder, "" )
@@ -63,15 +58,10 @@ class EchoCommand ( val arguments: Array [String] ) extends Command {
     }
     else {
 
-      def replacer ( folder: Folder, entity: FileSystemEntity ): Folder = {
-
-        folder.replaceEntity ( entity )
-      }
-
       // Get the old file, create new file
       val oldFile: File = entity.asFile ()
       val newFile: File = new File ( state.workingFolder.path (), fileName, buildNewContent ( oldFile.contents, words, overwrite ) )
-      val newRoot = updateTree ( state.rootFolder, folderNames = folderNamesInPath, newFile, replacer )
+      val newRoot = updateTree ( state.rootFolder, folderNames = folderNamesInPath, newFile, ( folder: Folder, entity: FileSystemEntity ) => folder.replaceEntity ( entity ) )
       val newWorkingFolder: Folder = newRoot.findDescendant ( folderNamesInPath )
 
       new State ( newRoot, newWorkingFolder, "" )
