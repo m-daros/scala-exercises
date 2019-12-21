@@ -92,6 +92,7 @@ class CdCommandSpec extends FlatSpec with Matchers {
     filteredTokens ( 2 ) should be ( "folder3" )
   }
 
+  /* TODO Spostare nella FolderSpec, ma rimosso in favore di un metodo con una signature simile --> RIMUOVERE ?
   "findFolder " should "should find an existing folder" in {
 
     val childFolder1: Folder = new Folder ( "/folder1", "childFolder1" )
@@ -119,7 +120,9 @@ class CdCommandSpec extends FlatSpec with Matchers {
     foundChildFolder2.parentPath should be ( "/folder1" )
     foundChildFolder2 should be ( childFolder2 )
   }
+   */
 
+  /* Spostare nella FolderSpec, ma rimosso in favore di un metodo con una signature simile --> RIMUOVERE ?
   "findFolder " should "should return null in case it's unable to find the required folder" in {
 
     val childFolder1: Folder = new Folder ( "/folder1", "childFolder1" )
@@ -141,4 +144,5 @@ class CdCommandSpec extends FlatSpec with Matchers {
     notFoundFolder should be ( null )
     notFoundFolder2 should be ( null )
   }
+   */
 }

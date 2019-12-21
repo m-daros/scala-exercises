@@ -31,7 +31,9 @@ class CdCommand ( val arguments: Array [String] ) extends Command {
 
       if ( ! foldersNamesInPath.isEmpty ) {
 
-        destinationFolder = findFolder ( foldersNamesInPath.tail, state.rootFolder ) // Se lo tolgo prima, evitare qui di fare il tail
+        // TODO throw exception if it's not a Folder
+//        destinationFolder = state.rootFolder.findDescendant ( foldersNamesInPath.tail, state.rootFolder ).asFolder ()// Se lo tolgo prima, evitare qui di fare il tail
+        destinationFolder = state.rootFolder.findDescendant ( foldersNamesInPath.tail ).asFolder ()// Se lo tolgo prima, evitare qui di fare il tail
       }
 
       if ( destinationFolder == null ) {
@@ -112,6 +114,8 @@ class CdCommand ( val arguments: Array [String] ) extends Command {
     }
   }
 
+  // TODO Portato nella classe Folder, provare ad usare quello
+  /*
   @tailrec
   final def findFolder ( foldersNamesInPath: Array [String], currentFolder: Folder ): Folder = {
 
@@ -128,6 +132,7 @@ class CdCommand ( val arguments: Array [String] ) extends Command {
         findFolder ( foldersNamesInPath.tail, currentFolder.findEntity ( foldersNamesInPath.head ).asFolder () )
     }
   }
+   */
 }
 
 object CdCommand {

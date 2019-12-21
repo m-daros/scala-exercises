@@ -9,12 +9,29 @@ class Folder ( override val parentPath: String, override val name: String, val c
     parentPath.equals ( Folder.ROOT_PARENT_PATH )
   }
 
+  // TODO TESTARE
+  /*
+  protected def getFolderNamesInPath ( path: String )  = {
+
+    val splits: Array [ String ] = path.split ( FileSystemEntity.PATH_SEPARATOR )
+
+    if ( splits.isEmpty ) {
+
+      Array [ String ] ()
+    }
+    else {
+
+      splits.tail
+    }
+  }
+   */
+
   def replaceEntity ( entity: FileSystemEntity ): Folder = {
 
     new Folder ( parentPath, name, children.filter ( child => ! child.name.equals ( entity.name ) ) :+ entity )
   }
 
-  def findEntity ( name: String ): FileSystemEntity  = {
+  def findChild ( name: String ): FileSystemEntity  = {
 
     val filtered: List [FileSystemEntity] = children.filter ( e => e.name.equals ( name ) )
 
@@ -27,6 +44,29 @@ class Folder ( override val parentPath: String, override val name: String, val c
       return filtered.head
     }
   }
+
+  /* TODO RIMUOVERE
+  @tailrec
+  final def findDescendant ( foldersNamesInPath: Array [String], currentFolder: Folder ): FileSystemEntity = {
+
+    /* TODO usare questa istruzione per estrarre array the tokend dato il path
+    val foldersNamesInPath: Array [String] = destinationFolderPath.split ( FileSystemEntity.PATH_SEPARATOR ) // TODO *** Exclude the first empty string if exists
+     */
+
+    if ( foldersNamesInPath.isEmpty ) {
+
+      currentFolder
+    }
+    else if ( ! currentFolder.hasEntity ( foldersNamesInPath.head ) ) {
+
+      null
+    }
+    else {
+
+      findDescendant ( foldersNamesInPath.tail, currentFolder.findLocalEntity ( foldersNamesInPath.head ).asFolder () )
+    }
+  }
+   */
 
   def addEntity ( entity: FileSystemEntity ): Folder = {
 
@@ -48,16 +88,36 @@ class Folder ( override val parentPath: String, override val name: String, val c
     new Folder ( parentPath, name, children.filter ( child => ! child.name.equals ( entityName ) ) )
   }
 
+  // TODO Esiste anche altro metodo che ha come parametro il localFolder
+//  @tailrec
+//  final def findDescendant ( folderNamesInPath: Array [String] ): FileSystemEntity  = {
+//
+//    if ( folderNamesInPath.isEmpty ) {
+//
+//      this
+//    }
+//    else {
+//
+//      findLocalEntity ( folderNamesInPath.head ).asFolder ().findDescendant ( folderNamesInPath.tail )
+////      findDescendant ( folderNamesInPath.tail )
+//    }
+//  }
+
   @tailrec
-  final def findDescendant ( folderNamesInPath: Array [String] ): Folder  = {
+  final def findDescendant ( folderNamesInPath: Array [String] ): FileSystemEntity  = {
 
     if ( folderNamesInPath.isEmpty ) {
 
-      this
+      null
+//      this
+    }
+    else if ( folderNamesInPath.length == 1 ) {
+
+      findChild ( folderNamesInPath.head )
     }
     else {
 
-      findEntity ( folderNamesInPath.head ).asFolder ().findDescendant ( folderNamesInPath.tail )
+      findChild ( folderNamesInPath.head ).asFolder ().findDescendant ( folderNamesInPath.tail )
     }
   }
 

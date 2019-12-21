@@ -107,7 +107,7 @@ class FolderSpec extends FlatSpec with Matchers {
     myFileSystemException.message.contains ( "child2" )                      should be ( true )
   }
 
-  "findEntity ( name )" should "should return the child having the given name if it exists" in {
+  "findChild ( name )" should "should return the child having the given name if it exists" in {
 
     val childFolder1: Folder = new Folder ( "/folder1/folder2/myFolder", "child1" )
     val childFolder2: Folder = new Folder ( "/folder1/folder2/myFolder", "child2" )
@@ -116,9 +116,9 @@ class FolderSpec extends FlatSpec with Matchers {
     val folder: Folder = new Folder ( "/folder1/folder2", "myFolder", List ( childFolder1, childFolder2, childFile3 ) )
 
     // Invoke method under test
-    val foundChild1: Folder = folder.findEntity ( "child1" ).asFolder ()
-    val foundChild2: Folder = folder.findEntity ( "child2" ).asFolder ()
-    val foundChild3: File   = folder.findEntity ( "child3" ).asFile ()
+    val foundChild1: Folder = folder.findChild ( "child1" ).asFolder ()
+    val foundChild2: Folder = folder.findChild ( "child2" ).asFolder ()
+    val foundChild3: File   = folder.findChild ( "child3" ).asFile ()
 
     // Assertions
     foundChild1.parentPath  should be ( "/folder1/folder2/myFolder" )
@@ -134,14 +134,14 @@ class FolderSpec extends FlatSpec with Matchers {
     foundChild3.hashCode () should be ( childFile3.hashCode () )
   }
 
-  "findEntity ( name )" should "should return null if doesn't exist a child having the given name " in {
+  "findChild ( name )" should "should return null if doesn't exist a child having the given name " in {
 
     val folder: Folder = new Folder ( "/folder1/folder2", "myFolder" )
 
     // Invoke method under test
-    val foundChild1: FileSystemEntity = folder.findEntity ( "child1" )
-    val foundChild2: FileSystemEntity = folder.findEntity ( "child2" )
-    val foundChild3: FileSystemEntity = folder.findEntity ( "child3" )
+    val foundChild1: FileSystemEntity = folder.findChild ( "child1" )
+    val foundChild2: FileSystemEntity = folder.findChild ( "child2" )
+    val foundChild3: FileSystemEntity = folder.findChild ( "child3" )
 
     // Assertions
     foundChild1 should be ( null )
@@ -149,7 +149,7 @@ class FolderSpec extends FlatSpec with Matchers {
     foundChild3 should be ( null )
   }
 
-  "removeEntity ( name )" should "throw an exception if the working folder doe not contains the folder we want to remove" in {
+  "findChild ( name )" should "throw an exception if the working folder doe not contains the folder we want to remove" in {
 
     val child1: Folder = new Folder ( "/folder1/folder2/myFolder", "child1" )
     val child2: Folder = new Folder ( "/folder1/folder2/myFolder", "child2" )
@@ -196,5 +196,51 @@ class FolderSpec extends FlatSpec with Matchers {
     val updatedFolder3: Folder = updatedFolder2.removeEntity ( "childFile3" )
 
     updatedFolder3.children.size should be ( 0 )
+  }
+
+///////////////////////////
+
+  "findEntity " should "should find an existing folder" in {
+
+    val childFolder1: Folder = new Folder ( "/folder1", "childFolder1" )
+    val childFolder2: Folder = new Folder ( "/folder1", "childFolder2" )
+
+    val folder1: Folder = new Folder ( "", "folder1", List ( childFolder1, childFolder2 ) )
+
+    val rootFolder: Folder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME, List ( folder1 ) )
+
+    // Invoke the method under test
+    val foundChildFolder1: Folder = rootFolder.findDescendant ( Array ( "folder1", "childFolder1" ) ).asFolder ()
+    val foundChildFolder2: Folder = rootFolder.findDescendant ( Array ( "folder1", "childFolder2" ) ).asFolder ()
+
+    foundChildFolder1 should not be ( null )
+    foundChildFolder1.name should be ( "childFolder1" )
+    foundChildFolder1.parentPath should be ( "/folder1" )
+    foundChildFolder1 should be ( childFolder1 )
+
+    foundChildFolder2 should not be ( null )
+    foundChildFolder2.name should be ( "childFolder2" )
+    foundChildFolder2.parentPath should be ( "/folder1" )
+    foundChildFolder2 should be ( childFolder2 )
+  }
+
+  "findEntity " should "should return null in case it's unable to find the required folder" in {
+
+    val childFolder1: Folder = new Folder ( "/folder1", "childFolder1" )
+    val childFolder2: Folder = new Folder ( "/folder1", "childFolder2" )
+
+    val folder1: Folder = new Folder ( "", "folder1", List ( childFolder1, childFolder2 ) )
+
+    val rootFolder: Folder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME, List ( folder1 ) )
+
+    val folderNamesInPath: Array [String] = Array ( "folder1", "childFolder1" )
+
+    // Invoke the method under test
+    val notFoundFolder: FileSystemEntity = rootFolder.findDescendant ( Array ( "folder1", "unknownChildFolder" ) )
+    val notFoundFolder2: FileSystemEntity = rootFolder.findDescendant ( Array ( "folder1", "unknownChildFolder2" ) )
+
+    // Assertions
+    notFoundFolder should be ( null )
+    notFoundFolder2 should be ( null )
   }
 }

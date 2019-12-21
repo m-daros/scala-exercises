@@ -1,81 +1,91 @@
 package mdaros.exercises.scala.chapter2.filesystem.command
 
-import mdaros.exercises.scala.chapter2.filesystem.model.{FileSystemEntity, Folder}
+import mdaros.exercises.scala.chapter2.filesystem.model.{File, FileSystemEntity, Folder, MyFileSystemException}
 import mdaros.exercises.scala.chapter2.filesystem.state.State
 
 import scala.annotation.tailrec
 
-abstract class WriteContentCommand(tokens: Array [String] ) extends Command {
+abstract class WriteContentCommand ( arguments: Array [String] ) extends Command {
 
-  override def apply ( state: State ): State = {
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
+  def writeToStdout ( state: State, words: Array [ String ], contentSeparator: String ) : State = {
 
-    val workingFolder: Folder = state.workingFolder
-
-    @tailrec
-    def applyHelper ( state: State, tokens: Array [String] ): State = {
-
-      if ( tokens.isEmpty ) {
-
-        state
-      }
-      else {
-
-        applyHelper ( evaluateToken ( state, tokens.head ), tokens.tail )
-      }
-    }
-
-    def evaluateToken ( state: State, token: String ): State = {
-
-      if ( workingFolder.hasEntity ( token ) ) {
-
-        state.setMessage ( state.commandOutput + "\n" + token + " already exists" )
-      }
-      else {
-
-        doCreateEntity ( state, token )
-      }
-    }
-
-    applyHelper ( state, tokens.tail ) // Discard first token since it's the command name
+    new State ( state.rootFolder, state.workingFolder, words.mkString ( contentSeparator ) )
   }
 
-  def updateTree ( currentFolder: Folder, folderNames: Array [String], newEntity: FileSystemEntity ): Folder = {
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
+  def writeToFile ( state: State, fileName: String, words: Array [ String ], overwrite: Boolean ): State = {
 
-    if ( folderNames.isEmpty ) {
+    val folderNamesInPath: Array [String] = getFolderNamesInPath ( state.workingFolder.path () );
+    val entity: FileSystemEntity = state.workingFolder.findDescendant ( folderNamesInPath :+ fileName )
+//    val entity: FileSystemEntity = state.workingFolder.findChild ( fileName )
 
-      currentFolder.addEntity ( newEntity )
+    if ( entity == null ) {
+
+      val targetFile: File = new File ( state.workingFolder.path (), fileName, words.mkString ( " " ) )
+      val newRoot = updateTree ( state.rootFolder, folderNames = folderNamesInPath, targetFile, ( folder: Folder, entity: FileSystemEntity ) => folder.addEntity ( entity ) )
+      val newWorkingFolder: Folder = newRoot.findDescendant ( folderNamesInPath ).asFolder () // TODO Controllare che sia un Folder e dare eccezione in caso contrario
+
+      new State ( newRoot, newWorkingFolder, "" )
+    }
+    else if ( entity.getType ().equals ( "Folder" ) ) { // TODO Use constant for Type Directory 7 Type File or implements methods isFIle (), isFOlder ()
+
+      throw new MyFileSystemException ( "Unable to echo contents to the item " + entity.path () + " because it's a Folder" )
     }
     else {
 
-      val oldFolder: Folder = currentFolder.findEntity ( folderNames.head ).asFolder ()
-      currentFolder.replaceEntity ( updateTree ( oldFolder, folderNames.tail, newEntity ) )
+      // Get the old file, create new file
+      val oldFile: File = entity.asFile ()
+      val newFile: File = new File ( state.workingFolder.path (), fileName, buildNewContent ( oldFile.contents, words, overwrite ) )
+      val newRoot = updateTree ( state.rootFolder, folderNames = folderNamesInPath, newFile, ( folder: Folder, entity: FileSystemEntity ) => folder.replaceEntity ( entity ) )
+      val newWorkingFolder: Folder = newRoot.findDescendant ( folderNamesInPath ).asFolder () // TODO Controllare che sia un Folder e dare eccezione in caso contrario
+
+      new State ( newRoot, newWorkingFolder, "" )
     }
   }
 
-  def doCreateEntity ( state: State, folderName: String ): State = {
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
+  // TODO Testare
+  protected def getFolderNamesInPath ( path: String )  = {
 
-    val workingFolder: Folder = state.workingFolder
-    val folderPath: String = workingFolder.path ()
+    val splits: Array [ String ] = path.split ( FileSystemEntity.PATH_SEPARATOR )
 
-    // 1. Get all the folders in fullPath
-    val folderNamesInPath: Array [String] = getFolderNamesInPath ( folderPath )
+    if ( splits.isEmpty ) {
 
-    // 2. Create new entity into workingFolder
-    val newEntity: FileSystemEntity = createEntity ( folderPath, folderName )
+      Array [ String ] ()
+    }
+    else {
 
-    // 3. Update the whole folder structure starting from ROOT to fullPath
-    val newRootFolder: Folder = updateTree ( state.rootFolder, folderNamesInPath, newEntity )
-
-    // 4. Find new working folder instance given workingFolder full path in the NEW folder structure
-    val newWorkingFolder: Folder = newRootFolder.findDescendant ( folderNamesInPath )
-
-    new State ( newRootFolder, newWorkingFolder, state.commandOutput )
+      splits.tail
+    }
   }
 
-  protected def getFolderNamesInPath ( folderPath: String ) = {
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
+  // TODO Copiato da CreateEntityCommand --> Portare in una classe comune
+  def updateTree ( currentFolder: Folder, folderNames: Array [String], newEntity: FileSystemEntity, updater: ( Folder, FileSystemEntity ) => Folder ): Folder = {
 
-    folderPath.split ( FileSystemEntity.PATH_SEPARATOR ).filter ( e => ! e.equals ( "" ) ) // TODO REMOCVE first if is an empty string
+    if ( folderNames.isEmpty ) {
+
+      updater.apply ( currentFolder, newEntity );
+    }
+    else {
+
+//      val oldFolder: Folder = currentFolder.findLocalEntity ( folderNames.head ).asFolder ()
+      val oldFolder: Folder = currentFolder.findDescendant ( Array ( folderNames.head ) ).asFolder ()
+      currentFolder.replaceEntity ( updateTree ( oldFolder, folderNames.tail, newEntity, updater ) )
+    }
   }
 
-  def createEntity ( folderPath: String, entityName: String ): FileSystemEntity
+  // TODO Può essere estratta logica condivisa con il comando CatCommand
+  private def buildNewContent ( oldContent: String, newContents: Array [String], overwrite: Boolean ) = {
+
+    if ( overwrite ) {
+
+      newContents.mkString ( " " )
+    }
+    else {
+
+      oldContent + "\n" + newContents.mkString ( " " )
+    }
+  }
 }
