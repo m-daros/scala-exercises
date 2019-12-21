@@ -18,7 +18,8 @@ class CatCommand ( val arguments: Array [String] ) extends WriteContentCommand (
     if ( arguments.length == 2 ) {
 
 //      val file: File = findFile ( arguments.tail, state.workingFolder )
-      val file: File = state.workingFolder.findDescendant ( arguments.tail ).asFile () // TODO Dare eccezione se non è un File
+//      val file: File = state.workingFolder.findDescendant ( arguments.tail ).asFile () // TODO Dare eccezione se non è un File
+      val file: File = state.workingFolder.findDescendant ( arguments.tail.mkString ( FileSystemEntity.PATH_SEPARATOR ) ).asFile () // TODO Dare eccezione se non è un File
 
       // TODO Gestire i casi in cui fileNAme contiene / => quindi occorre estrarre l'array dei tokens
       writeToStdout ( state, Array ( file.contents ), contentSeparator = "\n" )
@@ -40,7 +41,7 @@ class CatCommand ( val arguments: Array [String] ) extends WriteContentCommand (
       // TODO Gestire i casi in cui fileName contiene / => quindi occorre estrarre l'array dei tokens
       // TODO Gestire i casi in cui non si trova il file
 //      val contents: Array [String] = arguments.tail.map ( fileName => findFile ( Array ( fileName ), state.workingFolder ) ).map ( file => file.contents )
-      val contents: Array [String] = arguments.tail.map ( fileName => state.workingFolder.findDescendant ( Array ( fileName ) ).asFile () ).map (file => file.contents )
+      val contents: Array [String] = arguments.tail.map ( fileName => state.workingFolder.findDescendant ( fileName ).asFile () ).map (file => file.contents )
 
       writeToStdout ( state, contents, contentSeparator = "\n" )
     }

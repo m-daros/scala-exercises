@@ -33,7 +33,7 @@ class CdCommand ( val arguments: Array [String] ) extends Command {
 
         // TODO throw exception if it's not a Folder
 //        destinationFolder = state.rootFolder.findDescendant ( foldersNamesInPath.tail, state.rootFolder ).asFolder ()// Se lo tolgo prima, evitare qui di fare il tail
-        destinationFolder = state.rootFolder.findDescendant ( foldersNamesInPath.tail ).asFolder ()// Se lo tolgo prima, evitare qui di fare il tail
+        destinationFolder = state.rootFolder.findDescendant ( foldersNamesInPath.tail.mkString ( FileSystemEntity.PATH_SEPARATOR ) ).asFolder ()// Se lo tolgo prima, evitare qui di fare il tail
       }
 
       if ( destinationFolder == null ) {

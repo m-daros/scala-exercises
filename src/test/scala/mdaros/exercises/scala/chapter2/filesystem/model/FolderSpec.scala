@@ -210,8 +210,8 @@ class FolderSpec extends FlatSpec with Matchers {
     val rootFolder: Folder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME, List ( folder1 ) )
 
     // Invoke the method under test
-    val foundChildFolder1: Folder = rootFolder.findDescendant ( Array ( "folder1", "childFolder1" ) ).asFolder ()
-    val foundChildFolder2: Folder = rootFolder.findDescendant ( Array ( "folder1", "childFolder2" ) ).asFolder ()
+    val foundChildFolder1: Folder = rootFolder.findDescendant ( "/folder1/childFolder1" ).asFolder ()
+    val foundChildFolder2: Folder = rootFolder.findDescendant ( "/folder1/childFolder2" ).asFolder ()
 
     foundChildFolder1 should not be ( null )
     foundChildFolder1.name should be ( "childFolder1" )
@@ -236,8 +236,8 @@ class FolderSpec extends FlatSpec with Matchers {
     val folderNamesInPath: Array [String] = Array ( "folder1", "childFolder1" )
 
     // Invoke the method under test
-    val notFoundFolder: FileSystemEntity = rootFolder.findDescendant ( Array ( "folder1", "unknownChildFolder" ) )
-    val notFoundFolder2: FileSystemEntity = rootFolder.findDescendant ( Array ( "folder1", "unknownChildFolder2" ) )
+    val notFoundFolder: FileSystemEntity = rootFolder.findDescendant (  "/folder1/unknownChildFolder" )
+    val notFoundFolder2: FileSystemEntity = rootFolder.findDescendant ( "/folder1/unknownChildFolder2" )
 
     // Assertions
     notFoundFolder should be ( null )

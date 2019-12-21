@@ -25,6 +25,16 @@ class Folder ( override val parentPath: String, override val name: String, val c
     }
   }
    */
+  protected def getFolderNamesInPath ( folderPath: String ) = {
+
+    folderPath.split ( FileSystemEntity.PATH_SEPARATOR ).filter ( e => ! e.equals ( "" ) ) // TODO REMOCVE first if is an empty string
+  }
+
+  protected def getPath ( folderNamesInPath: Array [String] ) : String = {
+
+//    FileSystemEntity.PATH_SEPARATOR + folderNamesInPath.mkString ( FileSystemEntity.PATH_SEPARATOR )
+    folderNamesInPath.mkString ( FileSystemEntity.PATH_SEPARATOR )
+  }
 
   def replaceEntity ( entity: FileSystemEntity ): Folder = {
 
@@ -104,20 +114,29 @@ class Folder ( override val parentPath: String, override val name: String, val c
 //  }
 
   @tailrec
-  final def findDescendant ( folderNamesInPath: Array [String] ): FileSystemEntity  = {
+  final def findDescendant ( folderPath: String ): FileSystemEntity  = {
 
-    if ( folderNamesInPath.isEmpty ) {
+    if ( this.path ().equals ( folderPath ) ) {
 
-      null
-//      this
-    }
-    else if ( folderNamesInPath.length == 1 ) {
-
-      findChild ( folderNamesInPath.head )
+      this
     }
     else {
 
-      findChild ( folderNamesInPath.head ).asFolder ().findDescendant ( folderNamesInPath.tail )
+      val folderNamesInPath: Array [String] = getFolderNamesInPath ( folderPath )
+
+      if ( folderNamesInPath.isEmpty ) {
+
+        null
+        //      this
+      }
+      else if ( folderNamesInPath.length == 1 ) {
+
+        findChild ( folderNamesInPath.head )
+      }
+      else {
+
+        findChild ( folderNamesInPath.head ).asFolder ().findDescendant ( getPath ( folderNamesInPath.tail ) )
+      }
     }
   }
 
