@@ -179,11 +179,11 @@ class EchoCommandSpec extends FlatSpec with Matchers {
 
     val tokens: Array [String] = Array ( "echo", "something", "somethingelse", ">", "someFile" )
 
-    // Invoke the method under test
     val command: Command = EchoCommand.parse ( tokens )
 
     val rootFolder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME )
 
+    // Invoke the method under test
     val state: State = command.apply ( new State ( rootFolder, rootFolder, "" ) )
 
     // Assertions
@@ -201,5 +201,31 @@ class EchoCommandSpec extends FlatSpec with Matchers {
     val file: File = children ( 0 ).asInstanceOf [ File ]
 
     file.contents  should be ( "something somethingelse" )
+  }
+
+  "echo something somethingelse > folder2/file3" should " write something somethingelse content on file /folder1/folder2/file3" in {
+
+    val tokens: Array [String] = Array ( "echo", "something", "somethingelse", ">", "folder2/file3" )
+
+    val folder2: Folder = new Folder ( "/folder1", "folder2" )
+    val folder1: Folder = new Folder ( "/", "folder1", List ( folder2 ) )
+    val rootFolder: Folder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME, List ( folder1 ) )
+
+    val command: Command = EchoCommand.parse ( tokens )
+
+    // Invoke the method under test
+    val state: State = command.apply ( new State ( rootFolder, folder1, "" ) )
+
+    state.workingFolder.children.size should be ( 1 )
+    state.workingFolder.children.head.getType () should be ( "Folder" ) // TODO Usare costante per tipo Folder
+
+    val folder2FromState: Folder = state.workingFolder.children.head.asFolder ()
+
+    folder2FromState.children.size should be ( 1 )
+    folder2FromState.children.head.getType () should be ( "File" ) // TODO Usare costante per tipo File
+
+    val file3: File = folder2FromState.children.head.asFile ()
+
+    file3.contents should be ( "something somethingelse" )
   }
 }

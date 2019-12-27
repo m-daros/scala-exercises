@@ -10,23 +10,6 @@ import scala.io.Source
 
 object Filesystem extends App {
 
-  /* OLD
-  val commandLineScanner = new Scanner ( System.in )
-  val rootFolder = Folder.empty ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME )
-
-  var state = State ( rootFolder, rootFolder )
-  state.show ()
-
-  while ( true ) {
-
-    state = state.setMessage ( "" ) // Cleanup status from previous command
-
-    val commandLine = commandLineScanner.nextLine ()
-    state = Command.from ( commandLine ).apply ( state )
-    state.show ()
-  }
-   */
-
   val rootFolder = Folder.empty ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME )
   val initialState: State = State ( rootFolder, rootFolder )
 
