@@ -127,7 +127,6 @@ class Folder ( override val parentPath: String, override val name: String, val c
       if ( folderNamesInPath.isEmpty ) {
 
         null
-        //      this
       }
       else if ( folderNamesInPath.length == 1 ) {
 

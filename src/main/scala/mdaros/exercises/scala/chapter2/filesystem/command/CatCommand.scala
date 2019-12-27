@@ -17,53 +17,44 @@ class CatCommand ( val arguments: Array [String] ) extends WriteContentCommand (
 
     if ( arguments.length == 2 ) {
 
-      val file: File = state.workingFolder.findDescendant ( arguments.tail.mkString ( FileSystemEntity.PATH_SEPARATOR ) ).asFile () // TODO Dare eccezione se non è un File
+      val fileName: String = arguments.tail.mkString ( FileSystemEntity.PATH_SEPARATOR )
+      val filePath: String = getFilePath ( fileName, state.workingFolder.path () )
+      val entity: FileSystemEntity = state.rootFolder.findDescendant ( filePath ) // TODO Dare eccezione se non è un File
 
-      // TODO Gestire i casi in cui fileNAme contiene / => quindi occorre estrarre l'array dei tokens
-      writeToStdout ( state, Array ( file.contents ), contentSeparator = "\n" )
+      if ( null == entity ) {
+
+        state.setMessage ( "Unable to find " + filePath )
+      }
+      else {
+
+        writeToStdout ( state, Array ( entity.asFile ().contents ), contentSeparator = "\n" )
+      }
     }
     else if ( arguments ( arguments.length - 2 ).equals ( ">" ) ) {
 
+      val inputFileNames: Array [ String ] = arguments.slice ( 1, arguments.length - 2 )
+
       // TODO ... find dei files il cui path è contenuto in words
 
-      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = true )
+      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = inputFileNames, overwrite = true )
     }
     else if ( arguments ( arguments.length - 2 ).equals ( ">>" ) ) {
 
+      val inputFileNames: Array [ String ] = arguments.slice ( 1, arguments.length - 2 )
+
       // TODO ... find dei files il cui path è contenuto in words
 
-      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = false )
+      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = inputFileNames, overwrite = false )
     }
     else {
 
       // TODO Gestire i casi in cui fileName contiene / => quindi occorre estrarre l'array dei tokens
       // TODO Gestire i casi in cui non si trova il file
-      val contents: Array [String] = arguments.tail.map ( fileName => state.workingFolder.findDescendant ( fileName ).asFile () ).map (file => file.contents )
+      val contents: Array [String] = arguments.tail.map ( fileName => state.workingFolder.findDescendant ( fileName ).asFile () ).map ( file => file.contents )
 
       writeToStdout ( state, contents, contentSeparator = "\n" )
     }
   }
-
-  // TODO ...
-  // TODO RIMUOVERE IN FAVORE DELLA findDescendant presente in Folder
-  /*
-  @tailrec
-  final def findFile ( entityNamesInPath: Array [String], currentFolder: Folder ): File = {
-
-    if ( entityNamesInPath.tail.isEmpty ) {
-
-      currentFolder.findLocalEntity ( entityNamesInPath.head ).asFile ()
-    }
-//    else if ( ! currentFolder.hasEntity ( entityNamesInPath.head ) ) {
-//
-//        null // TODO USARE Option
-//    }
-    else {
-
-        findFile ( entityNamesInPath.tail, currentFolder.findLocalEntity ( entityNamesInPath.head ).asFolder () )
-    }
-  }
-   */
 }
 
 object CatCommand {
