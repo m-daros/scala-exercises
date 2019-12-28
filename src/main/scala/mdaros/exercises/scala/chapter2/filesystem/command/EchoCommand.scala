@@ -21,12 +21,12 @@ class EchoCommand ( val arguments: Array [String] ) extends WriteContentCommand 
     else if ( arguments ( arguments.length - 2 ).equals ( ">" ) ) {
 
       // TODO Gestire i casi in cui fileName contiene / => quindi occorre estrarre l'array dei tokens
-      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = true )
+      writeToFile(state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), contentSeparator = " " , overwrite = true)
     }
     else if ( arguments ( arguments.length - 2 ).equals ( ">>" ) ) {
 
       // TODO Gestire i casi in cui fileName contiene / => quindi occorre estrarre l'array dei tokens
-      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), overwrite = false )
+      writeToFile(state: State, fileName = arguments ( arguments.length - 1 ), words = arguments.slice ( 1, arguments.length - 2 ), contentSeparator = " " , overwrite = false)
     }
     else {
 

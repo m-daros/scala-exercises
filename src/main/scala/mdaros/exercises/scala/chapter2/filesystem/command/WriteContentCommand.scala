@@ -26,7 +26,7 @@ abstract class WriteContentCommand ( arguments: Array [String] ) extends Command
   }
 
   // TODO Può essere estratta logica condivisa con il comando CatCommand
-  def writeToFile ( state: State, fileName: String, words: Array [ String ], overwrite: Boolean ): State = {
+  def writeToFile ( state: State, fileName: String, words: Array[String], contentSeparator: String, overwrite: Boolean ): State = {
 
     val workingFolderPath: String = state.workingFolder.path ()
     val folderNamesInPath: Array [String] = getFolderNamesInPath ( workingFolderPath );
@@ -37,7 +37,7 @@ abstract class WriteContentCommand ( arguments: Array [String] ) extends Command
 
       // TODO se il fileName contiene / => occorre trovare il folder che conterrà il file, non è detto che sia il workingFolder
       val name: String = getFileName ( fileName )
-      val targetFile: File = new File ( getContainingFolderPath ( filePath ), name, words.mkString ( " " ) )
+      val targetFile: File = new File ( getContainingFolderPath ( filePath ), name, words.mkString ( contentSeparator ) )
       val newRoot = updateTree ( state.rootFolder, folderNames = getFolderNamesInPath ( targetFile.parentPath ), targetFile, ( folder: Folder, entity: FileSystemEntity ) => folder.addEntity ( entity ) )
       val newWorkingFolder: Folder = newRoot.findDescendant ( workingFolderPath ).asFolder () // TODO Controllare che sia un Folder e dare eccezione in caso contrario
 
@@ -52,7 +52,7 @@ abstract class WriteContentCommand ( arguments: Array [String] ) extends Command
       // Get the old file, create new file
       val oldFile: File = entity.asFile ()
       val name: String = getFileName ( fileName )
-      val newFile: File = new File ( oldFile.parentPath, name, buildNewContent ( oldFile.contents, words, overwrite ) ) // TODO NON E' DETTO CHE SIA NEL workingFolder
+      val newFile: File = new File ( oldFile.parentPath, name, buildNewContent ( oldFile.contents, words, contentSeparator, overwrite ) ) // TODO NON E' DETTO CHE SIA NEL workingFolder
       val newRoot = updateTree ( state.rootFolder, folderNames = folderNamesInPath, newFile, ( folder: Folder, entity: FileSystemEntity ) => folder.replaceEntity ( entity ) )
       val newWorkingFolder: Folder = newRoot.findDescendant ( workingFolderPath ).asFolder () // TODO Controllare che sia un Folder e dare eccezione in caso contrario
 
@@ -109,16 +109,15 @@ abstract class WriteContentCommand ( arguments: Array [String] ) extends Command
     }
   }
 
-  // TODO Può essere estratta logica condivisa con il comando CatCommand
-  private def buildNewContent ( oldContent: String, newContents: Array [String], overwrite: Boolean ) = {
+  private def buildNewContent ( oldContent: String, newContents: Array [String], contentSeparator: String, overwrite: Boolean ) = {
 
     if ( overwrite ) {
 
-      newContents.mkString ( " " )
+      newContents.mkString ( contentSeparator )
     }
     else {
 
-      oldContent + "\n" + newContents.mkString ( " " )
+      oldContent + "\n" + newContents.mkString ( contentSeparator )
     }
   }
 }

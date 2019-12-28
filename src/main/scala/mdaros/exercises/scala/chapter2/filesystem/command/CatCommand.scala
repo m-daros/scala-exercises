@@ -15,15 +15,20 @@ class CatCommand ( val arguments: Array [String] ) extends WriteContentCommand (
   // TODO OPEN FILE / FILES TO RETRIEVE CONTENT
   override def apply ( state: State ): State = {
 
+    def findEntity ( path: String, workingFolderPath: String ): FileSystemEntity = {
+
+      val filePath: String = getFilePath ( path, workingFolderPath )
+
+      state.rootFolder.findDescendant ( filePath ) // TODO Dare eccezione se non è un File
+    }
+
     if ( arguments.length == 2 ) {
 
-      val fileName: String = arguments.tail.mkString ( FileSystemEntity.PATH_SEPARATOR )
-      val filePath: String = getFilePath ( fileName, state.workingFolder.path () )
-      val entity: FileSystemEntity = state.rootFolder.findDescendant ( filePath ) // TODO Dare eccezione se non è un File
+      val entity: FileSystemEntity = findEntity ( path = arguments.last, state.workingFolder.path () ) // TODO Dare eccezione se non è un File
 
       if ( null == entity ) {
 
-        state.setMessage ( "Unable to find " + filePath )
+        state.setMessage ( "Unable to find " + arguments.last )
       }
       else {
 
@@ -32,19 +37,23 @@ class CatCommand ( val arguments: Array [String] ) extends WriteContentCommand (
     }
     else if ( arguments ( arguments.length - 2 ).equals ( ">" ) ) {
 
-      val inputFileNames: Array [ String ] = arguments.slice ( 1, arguments.length - 2 )
+      val inputFilePaths: Array [ String ] = arguments.slice ( 1, arguments.length - 2 )
 
-      // TODO ... find dei files il cui path è contenuto in words
+      // TODO Gestire casi nei quali non si trova il file
+      // TODO Gestire casi nei quali la entity é un Folder e non un File
+      val filesContents: Array [String] = inputFilePaths.map ( filePath => findEntity ( filePath, state.workingFolder.path () ).asFile ().contents )
 
-      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = inputFileNames, overwrite = true )
+      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = filesContents, separator = "\n" , overwrite = true)
     }
     else if ( arguments ( arguments.length - 2 ).equals ( ">>" ) ) {
 
-      val inputFileNames: Array [ String ] = arguments.slice ( 1, arguments.length - 2 )
+      val inputFilePaths: Array [ String ] = arguments.slice ( 1, arguments.length - 2 )
 
-      // TODO ... find dei files il cui path è contenuto in words
+      // TODO Gestire casi nei quali non si trova il file
+      // TODO Gestire casi nei quali la entity é un Folder e non un File
+      val filesContents: Array [String] = inputFilePaths.map ( filePath => findEntity ( filePath, state.workingFolder.path () ).asFile ().contents )
 
-      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = inputFileNames, overwrite = false )
+      writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = filesContents, separator = "\n" , overwrite = false)
     }
     else {
 
