@@ -1,6 +1,8 @@
 package mdaros.exercises.scala.chapter2.filesystem.command
 
-import mdaros.exercises.scala.chapter2.filesystem.model.{File, FileSystemEntity, Folder}
+import java.io.FileNotFoundException
+
+import mdaros.exercises.scala.chapter2.filesystem.model.{File, FileSystemEntity, Folder, MyFileSystemException}
 import mdaros.exercises.scala.chapter2.filesystem.state.State
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -106,7 +108,7 @@ class CatCommandSpec extends FlatSpec with Matchers {
 
     val foundFile3: File = folder2FromState.children.head.asFile ()
 
-    state.commandOutput should be ( "Unable to find /folder1/folder2/unknownFile" )
+    state.commandOutput should be ( "Impossibile trovare il file /folder1/folder2/unknownFile" )
   }
 
   "cat file1 file2 > file3" should " write the contents of file1 and file2 inside file3 separated by \n" in {
@@ -200,6 +202,53 @@ class CatCommandSpec extends FlatSpec with Matchers {
     state.workingFolder.children ( 1 ).getType () should be ( "File" ) // TODO Usare costante per tipo File
 
     state.commandOutput should be ( "Content of file1\nContent of file2" )
+  }
+
+  "cat folder1/file1" should "tell taht folder1/file1 doesn't exist" in {
+
+    val tokens: Array [String] = Array ( "cat", "folder1/file1" )
+
+    val rootFolder: Folder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME )
+
+    val command: Command = CatCommand.parse ( tokens )
+
+    // Invoke the method expecting an exception
+    val newState: State = command.apply ( new State ( rootFolder, rootFolder, "" ) )
+
+    // Assertions
+    newState.commandOutput should be ( "Impossibile trovare il file folder1/file1" )
+  }
+
+  "cat file1 file2" should "tell that file1 doesn't exist" in {
+
+    val tokens: Array [String] = Array ( "cat", "file1", "file2" )
+
+    val rootFolder: Folder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME )
+
+    val command: Command = CatCommand.parse ( tokens )
+
+    // Invoke the method expecting an exception
+    val newState: State = command.apply ( new State ( rootFolder, rootFolder, "" ) )
+
+    // Assertions
+    newState.commandOutput should be ( "Impossibile trovare il file file1" )
+  }
+
+  "cat folder1 folder2" should "tell that folder1 is not a File" in {
+
+    val tokens: Array [String] = Array ( "cat", "folder1", "folder2" )
+
+    val folder1: Folder = new Folder ( "/", "folder1" )
+    val folder2: Folder = new Folder ( "/", "folder2" )
+    val rootFolder: Folder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME, List ( folder1, folder2 ) )
+
+    val command: Command = CatCommand.parse ( tokens )
+
+    // Invoke the method under test
+    val state: State = command.apply ( new State ( rootFolder, rootFolder, "" ) )
+
+    // Assertions
+    state.commandOutput should be ( "Impossibile recuperare il contenuto di folder1 perchè non è un File" )
   }
 
   /* TODO findFile è stato rimosso e al suo posto si usa il metodo findDescendant della classe Folder, --> Capire se spostare questo test per il metodo findDescendant della classe Folder

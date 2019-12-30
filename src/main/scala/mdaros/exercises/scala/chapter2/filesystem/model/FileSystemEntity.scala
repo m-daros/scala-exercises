@@ -4,6 +4,10 @@ import mdaros.exercises.scala.chapter2.filesystem.model.Folder.empty
 
 abstract class FileSystemEntity ( val parentPath: String, val name: String ) {
 
+  def isFolder (): Boolean
+
+  def isFile (): Boolean
+
   def asFolder (): Folder
 
   def asFile (): File

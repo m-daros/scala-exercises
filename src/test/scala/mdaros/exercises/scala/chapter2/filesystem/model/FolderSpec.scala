@@ -198,8 +198,6 @@ class FolderSpec extends FlatSpec with Matchers {
     updatedFolder3.children.size should be ( 0 )
   }
 
-///////////////////////////
-
   "findEntity " should "should find an existing folder" in {
 
     val childFolder1: Folder = new Folder ( "/folder1", "childFolder1" )
@@ -242,5 +240,20 @@ class FolderSpec extends FlatSpec with Matchers {
     // Assertions
     notFoundFolder should be ( null )
     notFoundFolder2 should be ( null )
+  }
+
+  ///////
+
+  "findDescendant " should "should return null in case it's unable to find the required folder" in {
+
+    val rootFolder: Folder = new Folder ( Folder.ROOT_PARENT_PATH, Folder.ROOT_NAME )
+
+    val folderNamesInPath: Array [String] = Array ( "folder1", "childFolder1" )
+
+    // Invoke the method under test
+    val descendant: FileSystemEntity = rootFolder.findDescendant (  "/folder1/file2" )
+
+    // Assertions
+    descendant should be ( null )
   }
 }

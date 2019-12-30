@@ -60,7 +60,8 @@ abstract class WriteContentCommand ( arguments: Array [String] ) extends Command
     }
   }
 
-  protected def getFilePath ( fileName: String, workingFolderPath: String ) = {
+  // TODO protected ?
+  def getFilePath ( fileName: String, workingFolderPath: String ) = {
 
     if ( fileName.startsWith ( FileSystemEntity.PATH_SEPARATOR ) ) {
 
@@ -68,7 +69,14 @@ abstract class WriteContentCommand ( arguments: Array [String] ) extends Command
     }
     else {
 
-      workingFolderPath + FileSystemEntity.PATH_SEPARATOR + fileName
+      if ( workingFolderPath.equals ( "/" ) ) {
+
+        workingFolderPath + fileName
+      }
+      else {
+
+        workingFolderPath + FileSystemEntity.PATH_SEPARATOR + fileName
+      }
     }
   }
 
@@ -109,7 +117,7 @@ abstract class WriteContentCommand ( arguments: Array [String] ) extends Command
     }
   }
 
-  private def buildNewContent ( oldContent: String, newContents: Array [String], contentSeparator: String, overwrite: Boolean ) = {
+  protected def buildNewContent ( oldContent: String, newContents: Array [String], contentSeparator: String, overwrite: Boolean ) = {
 
     if ( overwrite ) {
 

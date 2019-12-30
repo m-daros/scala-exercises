@@ -1,5 +1,7 @@
 package mdaros.exercises.scala.chapter2.filesystem.model
 
+import java.io.FileNotFoundException
+
 import scala.annotation.tailrec
 
 class Folder ( override val parentPath: String, override val name: String, val children: List [ FileSystemEntity ] = List () ) extends FileSystemEntity ( parentPath, name ) {
@@ -9,22 +11,6 @@ class Folder ( override val parentPath: String, override val name: String, val c
     parentPath.equals ( Folder.ROOT_PARENT_PATH )
   }
 
-  // TODO TESTARE
-  /*
-  protected def getFolderNamesInPath ( path: String )  = {
-
-    val splits: Array [ String ] = path.split ( FileSystemEntity.PATH_SEPARATOR )
-
-    if ( splits.isEmpty ) {
-
-      Array [ String ] ()
-    }
-    else {
-
-      splits.tail
-    }
-  }
-   */
   protected def getFolderNamesInPath ( folderPath: String ) = {
 
     folderPath.split ( FileSystemEntity.PATH_SEPARATOR ).filter ( e => ! e.equals ( "" ) ) // TODO REMOCVE first if is an empty string
@@ -55,29 +41,6 @@ class Folder ( override val parentPath: String, override val name: String, val c
     }
   }
 
-  /* TODO RIMUOVERE
-  @tailrec
-  final def findDescendant ( foldersNamesInPath: Array [String], currentFolder: Folder ): FileSystemEntity = {
-
-    /* TODO usare questa istruzione per estrarre array the tokend dato il path
-    val foldersNamesInPath: Array [String] = destinationFolderPath.split ( FileSystemEntity.PATH_SEPARATOR ) // TODO *** Exclude the first empty string if exists
-     */
-
-    if ( foldersNamesInPath.isEmpty ) {
-
-      currentFolder
-    }
-    else if ( ! currentFolder.hasEntity ( foldersNamesInPath.head ) ) {
-
-      null
-    }
-    else {
-
-      findDescendant ( foldersNamesInPath.tail, currentFolder.findLocalEntity ( foldersNamesInPath.head ).asFolder () )
-    }
-  }
-   */
-
   def addEntity ( entity: FileSystemEntity ): Folder = {
 
     if ( hasEntity ( entity.name ) ) {
@@ -97,21 +60,6 @@ class Folder ( override val parentPath: String, override val name: String, val c
 
     new Folder ( parentPath, name, children.filter ( child => ! child.name.equals ( entityName ) ) )
   }
-
-  // TODO Esiste anche altro metodo che ha come parametro il localFolder
-//  @tailrec
-//  final def findDescendant ( folderNamesInPath: Array [String] ): FileSystemEntity  = {
-//
-//    if ( folderNamesInPath.isEmpty ) {
-//
-//      this
-//    }
-//    else {
-//
-//      findLocalEntity ( folderNamesInPath.head ).asFolder ().findDescendant ( folderNamesInPath.tail )
-////      findDescendant ( folderNamesInPath.tail )
-//    }
-//  }
 
   @tailrec
   final def findDescendant ( folderPath: String ): FileSystemEntity  = {
@@ -134,7 +82,18 @@ class Folder ( override val parentPath: String, override val name: String, val c
       }
       else {
 
-        findChild ( folderNamesInPath.head ).asFolder ().findDescendant ( getPath ( folderNamesInPath.tail ) )
+        // TODO return null se findChild non trova nulla, anzichè dare NullPointerException
+        val child: FileSystemEntity = findChild ( folderNamesInPath.head )
+
+        if ( null == child ) {
+
+          null
+        }
+        else {
+
+          // TODO dare eccezione se non è un Folder
+          child.asFolder ().findDescendant ( getPath ( folderNamesInPath.tail ) )
+        }
       }
     }
   }
@@ -142,6 +101,16 @@ class Folder ( override val parentPath: String, override val name: String, val c
   def hasEntity ( name: String ): Boolean = {
 
     children.map ( e => e.name ).contains ( name )
+  }
+
+  override def isFolder (): Boolean = {
+
+    true
+  }
+
+  override def isFile (): Boolean = {
+
+    false
   }
 
   override def asFolder (): Folder = {
