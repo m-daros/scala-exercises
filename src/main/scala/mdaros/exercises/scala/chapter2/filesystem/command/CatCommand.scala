@@ -14,79 +14,53 @@ class CatCommand ( val arguments: Array [String] ) extends WriteContentCommand (
     CatCommand.parse ( tokens )
   }
 
-  // TODO OPEN FILE / FILES TO RETRIEVE CONTENT
   override def apply ( state: State ): State = {
 
-    if ( arguments.length == 2 ) {
+    try {
 
-      val entity: FileSystemEntity = findEntity ( path = arguments.last, state.workingFolder.path (), state.rootFolder ) // TODO Dare eccezione se non è un File
+      if ( arguments.length == 2 ) {
 
-      if ( null == entity ) {
+        /*
+        val entity: FileSystemEntity = findEntity ( path = arguments.last, state.workingFolder.path (), state.rootFolder ) // TODO Dare eccezione se non è un File
 
-        state.setMessage ( "Impossibile trovare il file " + arguments.last )
+        if ( null == entity ) {
+
+          state.setMessage ( "Impossibile trovare il file " + arguments.last )
+        }
+        else {
+
+          writeToStdout ( state, Array ( entity.asFile ().contents ), contentSeparator = "\n" )
+        }
+         */
+        // arguments.tail contains only one element
+        val contents: Array [String] = arguments.tail.map ( fileName => extractFileContent ( state, fileName ) )
+        writeToStdout ( state, contents, contentSeparator = "\n" )
+      }
+      else if ( arguments ( arguments.length - 2 ).equals ( ">" ) ) { // TODO Blocco quasi identico al caso >>
+
+        val inputFilePaths: Array [String] = arguments.slice ( 1, arguments.length - 2 )
+        val filesContents: Array [String] = inputFilePaths.map ( filePath => extractFileContent ( state, filePath ) )
+        writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = filesContents, contentSeparator = "\n", overwrite = true )
+      }
+      else if ( arguments  ( arguments.length - 2 ).equals ( ">>" ) ) { // TODO Blocco quasi identico al caso >
+
+        val inputFilePaths: Array [String] = arguments.slice ( 1, arguments.length - 2 )
+        val filesContents: Array [String] = inputFilePaths.map ( filePath => extractFileContent ( state, filePath ) )
+        writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = filesContents, contentSeparator = "\n", overwrite = false )
       }
       else {
 
-        writeToStdout ( state, Array ( entity.asFile ().contents ), contentSeparator = "\n" )
-      }
-    }
-    else if ( arguments ( arguments.length - 2 ).equals ( ">" ) ) { // TODO Blocco quasi identico al caso >>
-
-      try {
-
-        val inputFilePaths: Array [ String ] = arguments.slice ( 1, arguments.length - 2 )
-
-        // TODO Gestire casi nei quali non si trova il file
-        // TODO Gestire casi nei quali la entity é un Folder e non un File
-        val filesContents: Array [String] = inputFilePaths.map ( filePath => extractFileContent ( state, filePath ) )
-
-        writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = filesContents, contentSeparator = "\n" , overwrite = true )
-      }
-      catch {
-
-        case e: Exception => {
-
-          state.setMessage ( e.getMessage )
-        }
-      }
-    }
-    else if ( arguments ( arguments.length - 2 ).equals ( ">>" ) ) { // TODO Blocco quasi identico al caso >
-
-      try {
-
-        val inputFilePaths: Array [ String ] = arguments.slice ( 1, arguments.length - 2 )
-
-        // TODO Gestire casi nei quali non si trova il file
-        // TODO Gestire casi nei quali la entity é un Folder e non un File
-
-        val filesContents: Array [String] = inputFilePaths.map ( filePath => extractFileContent ( state, filePath ) )
-
-        writeToFile ( state: State, fileName = arguments ( arguments.length - 1 ), words = filesContents, contentSeparator = "\n" , overwrite = false )
-      }
-      catch {
-
-        case e: Exception => {
-
-          state.setMessage ( e.getMessage )
-        }
-      }
-    }
-    else {
-
-      try {
-
         val contents: Array [String] = arguments.tail.map ( fileName => extractFileContent ( state, fileName ) )
-
         writeToStdout ( state, contents, contentSeparator = "\n" )
       }
-      catch {
+    }
+    catch {
 
         case e: Exception => {
 
           state.setMessage ( e.getMessage )
         }
       }
-    }
   }
 
   protected def extractFileContent ( state: State, filePath: String ): String = {
