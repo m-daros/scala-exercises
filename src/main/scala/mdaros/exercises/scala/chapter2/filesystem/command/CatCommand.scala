@@ -20,18 +20,6 @@ class CatCommand ( val arguments: Array [String] ) extends WriteContentCommand (
 
       if ( arguments.length == 2 ) {
 
-        /*
-        val entity: FileSystemEntity = findEntity ( path = arguments.last, state.workingFolder.path (), state.rootFolder ) // TODO Dare eccezione se non è un File
-
-        if ( null == entity ) {
-
-          state.setMessage ( "Impossibile trovare il file " + arguments.last )
-        }
-        else {
-
-          writeToStdout ( state, Array ( entity.asFile ().contents ), contentSeparator = "\n" )
-        }
-         */
         // arguments.tail contains only one element
         val contents: Array [String] = arguments.tail.map ( fileName => extractFileContent ( state, fileName ) )
         writeToStdout ( state, contents, contentSeparator = "\n" )
@@ -93,7 +81,17 @@ object CatCommand {
 
   def parse ( tokens: Array [String] ): Command = {
 
+    // TODO Gestire casi come cat file1 > file2 file3 come MalformedCommand
+
     if ( tokens.length < 2 ) {
+
+      new MalformedCommand ( tokens )
+    }
+    else if ( tokens.contains ( ">" ) && tokens.indexOf ( ">" ) < tokens.length - 2 ) {
+
+      new MalformedCommand ( tokens )
+    }
+    else if ( tokens.contains ( ">>" ) && tokens.indexOf ( ">>" ) < tokens.length - 2 ) {
 
       new MalformedCommand ( tokens )
     }

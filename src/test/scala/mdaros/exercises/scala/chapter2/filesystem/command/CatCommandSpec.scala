@@ -30,6 +30,28 @@ class CatCommandSpec extends FlatSpec with Matchers {
     command.isInstanceOf [ MalformedCommand ] should be ( true )
   }
 
+  "CatCommand" should "parse 'cat file1 > file2 file3' as MalformedCommand" in {
+
+    val tokens: Array [String] = Array ( "cat", "file1", ">", "file2", "file3" )
+
+    // Invoke the method under test
+    val command: Command = CatCommand.parse ( tokens )
+
+    // Assertions
+    command.isInstanceOf [ MalformedCommand ] should be ( true )
+  }
+
+  "CatCommand" should "parse 'cat file1 >> file2 file3' as MalformedCommand" in {
+
+    val tokens: Array [String] = Array ( "cat", "file1", ">>", "file2", "file3" )
+
+    // Invoke the method under test
+    val command: Command = CatCommand.parse ( tokens )
+
+    // Assertions
+    command.isInstanceOf [ MalformedCommand ] should be ( true )
+  }
+
   "cat folder2/file3" should "output the content the child folder2/file3 of the working folder" in {
 
     val tokens: Array [String] = Array ( "cat", "folder2/file3" )
