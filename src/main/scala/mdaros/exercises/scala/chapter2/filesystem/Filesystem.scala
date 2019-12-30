@@ -17,9 +17,10 @@ object Filesystem extends App {
 
   Source.stdin.getLines ().foldLeft ( initialState ) ( ( currentState: State, commandLine: String ) => {
 
-    val newState: State = Command.from ( commandLine ).apply ( currentState )
+    val state: State = currentState.setMessage ( "" ) // Cleanup previous output
+    val newState: State = Command.from ( commandLine ).apply ( state )
     newState.show ()
 
     newState
-  })
+  } )
 }
