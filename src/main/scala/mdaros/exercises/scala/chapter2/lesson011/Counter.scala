@@ -1,6 +1,6 @@
 package mdaros.exercises.scala.chapter2.lesson011
 
-class Counter ( count: Int ) {
+class Counter ( count: Int = 0 ) {
 
   def inc (): Counter = {
 
@@ -20,5 +20,10 @@ class Counter ( count: Int ) {
   def dec ( n: Int ): Counter = {
 
     new Counter ( count - n )
+  }
+
+  def count (): Int = {
+
+    this.count
   }
 }
