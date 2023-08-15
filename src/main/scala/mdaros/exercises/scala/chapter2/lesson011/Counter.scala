@@ -1,4 +1,4 @@
-package mdaros.exercises.scala.chapter2
+package mdaros.exercises.scala.chapter2.lesson011
 
 class Counter ( count: Int ) {
 

@@ -1,10 +1,10 @@
-package mdaros.exercises.scala.chapter2
+package mdaros.exercises.scala.chapter2.lesson011
 
-class Novel ( name: String, year: Int, val author: Writer ) {
+class Novel ( val name: String, val year: Int, val author: Writer ) {
 
   def authorAge (): Int = {
 
-    this.author.year - year
+    this.year - this.author.year
   }
 
   def isWrittenBy ( author: Writer ): Boolean = {
